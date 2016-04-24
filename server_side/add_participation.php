@@ -17,14 +17,6 @@
     <!-- MetisMenu CSS -->
     <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
-    <!-- DataTables CSS -->
-    <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.1.2/css/select.bootstrap.min.css">
-
-    <!-- DataTables Responsive CSS -->
-    <link href="../bower_components/datatables-responsive/css/responsive.dataTables.min.css" rel="stylesheet">
-
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
 
@@ -36,7 +28,7 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        <![endif]-->
 
 </head>
 
@@ -81,19 +73,55 @@
                         </li>
 
                         <li>
-                            <a href="institutions.php"><i class="fa fa-university fa-fw"></i> Institutions</a>
+                            <a href="#"><i class="fa fa-university fa-fw"></i> Institutions<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="institutions.php">View Institutions</a>
+                                </li>
+                                <li>
+                                    <a href="add_institution.php">Add New</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
 
                         <li>
-                            <a href="participants.php"><i class="fa fa-user fa-fw"></i> Participants</a>
+                            <a href="#"><i class="fa fa-user fa-fw"></i> Participants<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="participants.php">View Participants</a>
+                                </li>
+                                <li>
+                                    <a href="create_participant.php">Create New</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
 
                         <li>
-                            <a href="events.php"><i class="fa fa-list-alt fa-fw"></i> Events</a>
+                            <a href="#"><i class="fa fa-list-alt fa-fw"></i> Events<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="events.php">View Events</a>
+                                </li>
+                                <li>
+                                    <a href="create_event.php">Create New</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
 
                         <li>
-                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
+                            <a href="#"><i class="fa fa-check-square-o fa-fw"></i> Participation<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="participation.php">View Participation</a>
+                                </li>
+                                <li>
+                                    <a href="add_participation.php">Add New</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
 
                         <li>
@@ -118,57 +146,53 @@
             <!-- /.navbar-static-side -->
         </nav>
 
+        <!-- Page Content -->
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Participations</h1>                   
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-12">
-                        <div class="dataTable_wrapper">
-                        <table class="table table-striped table-bordered table-hover" id="participationsTable">
-                            <thead>
-                                <tr>
-                                    <th>Institution</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Event</th>
-                                    <th>Academic Year</th>
-                                    <th>Host</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-                            $rows = $result->num_rows;
-                            for ($j = 0 ; $j < $rows ; ++$j)
-                            {
-                                $result->data_seek($j);
-                                $row = $result->fetch_array(MYSQLI_ASSOC);
-                                ?>
-                                <tr>
-                                    <td><? echo $row['Institution']; ?></td>
-                                    <td><? echo $row['IsGLAA'] ? "Yes" : "No"; ?></td>
-                                    <td><??></td>
-                                    <td><??></td>
-                                    <td><??></td>
-                                    <td><??></td>
-                                </tr>
-                                <?php
-                            }
-                            $result->close();
-                            $conn->close();
-                            ?>
-                            </tbody>
-                        </table>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Add Participation</h1>
                     </div>
-                    <!-- /.table-responsive -->
+                    <!-- /.col-lg-12 -->
                 </div>
-                <!-- /.col-lg-12 -->
+                <!-- /.row -->
+                <!-- form -->
+                <form role="form" action="create_event.php" method="post">
+                    <div class="form-group">
+                        <label for="eventName">Event Name</label>
+                        <input name="eventName" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Enter description. Maximum 255 characters"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="academicYear">Academic Year</label>
+                        <input name="academicYear" type="text" class="form-control" placeholder="Enter 7 characters. Example: 2016-17">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="host">Host Institution</label>
+                        <input name="host" type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Selects</label>
+                        <select class="form-control">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-success">Submit</button>
+                    <button type="reset" name="reset" class="btn btn-default">Reset</button>
+                </form>
             </div>
-            <!-- /.row -->
+            <!-- /.container-fluid -->
         </div>
         <!-- /#page-wrapper -->
 
@@ -184,24 +208,8 @@
     <!-- Metis Menu Plugin JavaScript -->
     <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
-
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
-    <script>
-        $(document).ready(function() {
-            $('#participationsTable').DataTable({
-                "language": {
-                  "emptyTable": "There is no participation record at this point"
-                },
-                responsive: true
-            });
-        });
-    </script>
 
 </body>
 

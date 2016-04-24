@@ -1,14 +1,3 @@
-<?php 
-require_once '../login.php';
-$conn = new mysqli($hn, $un, $pw, $db);
-if ($conn->connect_error) die($conn->connect_error);
-
-$query  = "SELECT * FROM Events";
-$result = $conn->query($query);
-if (!$result) 
-    die ("Database access failed: " . $conn->error);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,9 +19,11 @@ if (!$result)
 
     <!-- DataTables CSS -->
     <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.1.2/css/select.bootstrap.min.css">
 
     <!-- DataTables Responsive CSS -->
-    <link href="../bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+    <link href="../bower_components/datatables-responsive/css/responsive.dataTables.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
@@ -90,55 +81,19 @@ if (!$result)
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-university fa-fw"></i> Institutions<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="institutions.php">View Institutions</a>
-                                </li>
-                                <li>
-                                    <a href="add_institution.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="institutions.php"><i class="fa fa-university fa-fw"></i> Institutions</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-user fa-fw"></i> Participants<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participants.php">View Participants</a>
-                                </li>
-                                <li>
-                                    <a href="create_participant.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participants.php"><i class="fa fa-user fa-fw"></i> Participants</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-list-alt fa-fw"></i> Events<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="events.php">View Events</a>
-                                </li>
-                                <li>
-                                    <a href="create_event.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="events.php"><i class="fa fa-list-alt fa-fw"></i> Events</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-check-square-o fa-fw"></i> Participation<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participation.php">View Participation</a>
-                                </li>
-                                <li>
-                                    <a href="add_participation.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>
@@ -177,6 +132,8 @@ if (!$result)
                         <table class="table table-striped table-bordered table-hover" id="eventsTable">
                             <thead>
                                 <tr>
+                                    <th></th>
+                                    <th>ID</th>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Year</th>
@@ -185,6 +142,16 @@ if (!$result)
                             </thead>
                             <tbody>
                             <?php
+                            require_once '../server_side/login.php';
+                            require_once '../server_side/helper.php';
+                            $conn = new mysqli($hn, $un, $pw, $db);
+                            if ($conn->connect_error) die($conn->connect_error);
+
+                            $query  = "SELECT * FROM Events";
+                            $result = $conn->query($query);
+                            if (!$result) 
+                                die ("Database access failed: " . $conn->error);
+
                             $rows = $result->num_rows;
                             for ($j = 0 ; $j < $rows ; ++$j)
                             {
@@ -192,20 +159,72 @@ if (!$result)
                                 $row = $result->fetch_array(MYSQLI_ASSOC);
                                 ?>
                                 <tr>
+                                    <td></td>
+                                    <td><? echo $row['EventID']; ?></td>
                                     <td><? echo $row['Name']; ?></td>
                                     <td><? echo $row['Description']; ?></td>
                                     <td><? echo $row['AcademicYear']; ?></td>
-                                    <td><? echo $row['Host']; ?></td>
+                                    <td><? echo getInstitution($conn, $row['HostID']); ?></td>
                                 </tr>
                                 <?php
                             }
-                            $result->close();
-                            $conn->close();
                             ?>
                             </tbody>
                         </table>
                     </div>
                     <!-- /.table-responsive -->
+
+                    <!-- The form which is used to populate the item data -->
+                    <form id="eventForm" method="post" class="form-horizontal" style="display: none;">
+                        <input type="hidden" name="id">
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Name:</label>
+                            <div class="col-xs-8">
+                                <input name="name" type="text" maxlength="100" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Description:</label>
+                            <div class="col-xs-8">
+                                <textarea name="description" maxlength="255" class="form-control" rows="3" placeholder="Enter description. Maximum 255 characters"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Academic Year</label>
+                            <div class="col-xs-8">
+                                <select name="year-select" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Host Institution</label>
+                            <div class="col-xs-8">
+                                <select name="institution-select" class="form-control">
+                                    <option>Select institution</option>
+                                    <?php
+                                    $query  = "SELECT InstitutionID, Institution FROM Institutions";
+                                    $result = $conn->query($query);
+                                    if (!$result) 
+                                        die ("Database access failed: " . $conn->error);
+
+                                    $rows = $result->num_rows;
+                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                    {
+                                        $result->data_seek($j);
+                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                        ?>
+                                        <option value="<? echo $row['InstitutionID']; ?>" ><? echo $row['Institution']; ?></option>
+                                        <?php
+                                    }
+                                    $result->close();
+                                    $conn->close();
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" id="form-update" class="hidden"></button>
+                    </form>
+                    <!-- /hidden form -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -228,21 +247,180 @@ if (!$result)
     <!-- DataTables JavaScript -->
     <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
     <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
+    
+    <!-- DataTables Selects -->
+    <script src="https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../js/bootboxjs/bootbox.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="../js/scripts.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
+    <!-- Populate Academic Year Selector -->
+    <script>
+        for (i = new Date().getFullYear(); i >= 2000; i--) {
+            $('select[name=year-select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+        }
+    </script>
+
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
-            $('#eventsTable').DataTable({
+            var table = $('#eventsTable').DataTable( {
+                "lengthChange": false,
                 "language": {
-                  "emptyTable": "There is no event at this point"
+                    "emptyTable": "There is no event at this point"
                 },
-                "bAutoWidth": false,
-                "aoColumns": [{ "sWidth": "25%" }, { "sWidth": "40%" }, { "sWidth": "10%" }, { "sWidth": "25%" }],
-                responsive: true
-            });
+                columnDefs: [ 
+                    {
+                        orderable: false,
+                        className: 'select-checkbox',
+                        targets: 0
+                    },
+                    {   
+                        visible: false,
+                        targets: 1
+                    } 
+                ],
+                select: {
+                    style: 'os'
+                },
+                order: [[ 1, 'asc' ]],
+                responsive: true,
+                initComplete: function(){
+                    var api = this.api();
+                    new $.fn.dataTable.Buttons(api, {
+                        buttons: [
+                            {
+                                text: 'New',
+                                action: function ( e, dt, node, config ) {
+                                    bootbox
+                                        .dialog({
+                                            title: 'Add event',
+                                            message: $('#eventForm'),
+                                            buttons: {
+                                                add: {
+                                                    label: 'Add',
+                                                    className: 'btn btn-success',
+                                                    callback: function() {
+                                                        $('#form-update').val("add").end();
+                                                        $('button#form-update').click();
+                                                    }
+                                                },
+                                                cancel: {
+                                                    label: 'Cancel',
+                                                    className: 'btn btn-default'
+                                                }
+                                            },
+                                            show: false
+                                        })
+                                        .on('show.bs.modal', function() {
+                                            $('#eventForm').show();
+                                        })
+                                        .on('hide.bs.modal', function(e) {
+                                            $('#eventForm').hide().appendTo('body');
+                                        })
+                                        .modal('show');
+                                }
+                            },
+                            {
+                                text: 'Edit',
+                                action: function ( e, dt, node, config ) {
+                                    var rowData = dt.row( { selected: true } ).data();
+                                    $('#eventForm').find('[name="id"]').val(rowData[1]).end();
+                                    $('#eventForm').find('[name="name"]').val(rowData[2]).end();
+                                    $('#eventForm').find('[name="description"]').val(rowData[3]).end();
+                                    $('select[name=year-select] option').filter(function() {
+                                        return $(this).text() == rowData[4]; 
+                                    }).prop('selected', true);
+                                    $('select[name=institution-select] option').filter(function() {
+                                        return $(this).text() == rowData[5]; 
+                                    }).prop('selected', true);
+                                    // alert(rowData); // ,1,Event1,this is a test,2016-17,Albion College
+                                    bootbox
+                                        .dialog({
+                                            title: 'Edit event',
+                                            message: $('#eventForm'),
+                                            buttons: {
+                                                update: {
+                                                    label: 'Update',
+                                                    className: 'btn btn-primary',
+                                                    callback: function() {
+                                                        $('#form-update').val("update").end();
+                                                        $('button#form-update').click();
+                                                    }
+                                                },
+                                                cancel: {
+                                                    label: 'Cancel',
+                                                    className: 'btn btn-default'
+                                                }
+                                            },
+                                            show: false
+                                        })
+                                        .on('show.bs.modal', function() {
+                                            $('#eventForm').show();
+                                        })
+                                        .on('hide.bs.modal', function(e) {
+                                            $('#eventForm').hide().appendTo('body');
+                                        })
+                                        .modal('show');
+                                },
+                                enabled: false
+                            },
+                            {
+                                text: 'Delete',
+                                action: function ( e, dt, node, config ) {
+                                    var rowData = dt.row( { selected: true } ).data();
+                                    $('#eventForm').find('[name="id"]').val(rowData[1]).end();
+
+                                    bootbox
+                                        .confirm( {
+                                            title: 'Delete',
+                                            message: 'Are you sure?',
+                                            reorder: true,
+                                            buttons: {
+                                                confirm: {
+                                                    label: 'Delete',
+                                                    className: 'btn btn-success'
+                                                },
+                                                cancel: {
+                                                    label: 'No',
+                                                    className: 'btn btn-danger'
+                                                }
+                                            },
+                                            callback: function(result) {
+                                                if (result) {
+                                                    $('#form-update').val("delete").end();
+                                                    $('button#form-update').click();
+                                                }
+                                            }
+                                        } );
+                                },
+                                enabled: false
+                            }
+                        ]
+                    });
+                    api.buttons().container().appendTo( '#' + api.table().container().id + ' .col-sm-6:eq(0)' );  
+                }
+            } );
+
+            table.on( 'select', function () {
+                table.button( 1 ).enable();
+                table.button( 2 ).enable();
+            } );
+
+            table.on( 'deselect', function () {
+                table.button( 1 ).disable();
+                table.button( 2 ).disable();
+            } );
         });
     </script>
 

@@ -1,14 +1,3 @@
-<?php 
-require_once '../server_side/login.php';
-$conn = new mysqli($hn, $un, $pw, $db);
-if ($conn->connect_error) die($conn->connect_error);
-
-$query  = "SELECT * FROM Institutions";
-$result = $conn->query($query);
-if (!$result) 
-    die ("Database access failed: " . $conn->error);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -92,55 +81,19 @@ if (!$result)
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-university fa-fw"></i> Institutions<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="institutions.php">View Institutions</a>
-                                </li>
-                                <li>
-                                    <a href="add_institution.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="institutions.php"><i class="fa fa-university fa-fw"></i> Institutions</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-user fa-fw"></i> Participants<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participants.php">View Participants</a>
-                                </li>
-                                <li>
-                                    <a href="create_participant.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participants.php"><i class="fa fa-user fa-fw"></i> Participants</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-list-alt fa-fw"></i> Events<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="events.php">View Events</a>
-                                </li>
-                                <li>
-                                    <a href="create_event.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="events.php"><i class="fa fa-list-alt fa-fw"></i> Events</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-check-square-o fa-fw"></i> Participation<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participation.php">View Participation</a>
-                                </li>
-                                <li>
-                                    <a href="add_participation.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>
@@ -173,33 +126,9 @@ if (!$result)
                 <!-- /.col-lg-12 -->
             </div>
 
-            <!-- Modal -->
-            <div class="modal fade" id="myModal" role="dialog">
-                <div class="modal-dialog">
-                
-                  <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Modal Header</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p></p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-
-                    
-
                     <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="institutionsTable">
                             <thead>
@@ -212,6 +141,15 @@ if (!$result)
                             </thead>
                             <tbody>
                             <?php
+                            require_once '../server_side/login.php';
+                            $conn = new mysqli($hn, $un, $pw, $db);
+                            if ($conn->connect_error) die($conn->connect_error);
+
+                            $query  = "SELECT * FROM Institutions";
+                            $result = $conn->query($query);
+                            if (!$result) 
+                                die ("Database access failed: " . $conn->error);
+                            
                             $rows = $result->num_rows;
                             for ($j = 0 ; $j < $rows ; ++$j)
                             {
@@ -236,12 +174,11 @@ if (!$result)
 
                     <!-- The form which is used to populate the item data -->
                     <form id="institutionForm" method="post" class="form-horizontal" style="display: none;">
-                        <input type="hidden" name="tableName" value="Institutions">
                         <input type="hidden" name="id">
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution Name:</label>
                             <div class="col-xs-8">
-                                <input name="institutionName" type="text" maxlength="100" class="form-control" disabled="disabled">
+                                <input name="institutionName" type="text" maxlength="100" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
@@ -257,6 +194,7 @@ if (!$result)
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
                     </form>
+                    <!-- /hidden form -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -327,10 +265,33 @@ if (!$result)
                             {
                                 text: 'New',
                                 action: function ( e, dt, node, config ) {
-                                    alert(
-                                        'Row data: '+
-                                        JSON.stringify( dt.row( { selected: true } ).data() )
-                                    );
+                                    bootbox
+                                        .dialog({
+                                            title: 'Add institution',
+                                            message: $('#institutionForm'),
+                                            buttons: {
+                                                add: {
+                                                    label: 'Add',
+                                                    className: 'btn btn-success',
+                                                    callback: function() {
+                                                        $('#form-update').val("add").end();
+                                                        $('button#form-update').click();
+                                                    }
+                                                },
+                                                cancel: {
+                                                    label: 'Cancel',
+                                                    className: 'btn btn-default'
+                                                }
+                                            },
+                                            show: false
+                                        })
+                                        .on('show.bs.modal', function() {
+                                            $('#institutionForm').show();
+                                        })
+                                        .on('hide.bs.modal', function(e) {
+                                            $('#institutionForm').hide().appendTo('body');
+                                        })
+                                        .modal('show');
                                 }
                             },
                             {
@@ -339,6 +300,7 @@ if (!$result)
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
                                     $('#institutionForm').find('[name="institutionName"]').val(rowData[2]).end();
+                                    $('#institutionForm').find('[name="institutionName"]').prop('disabled', true);
                                     if (rowData[3] === "Yes") {
                                         $("#isGLAATrue").prop("checked", true);
                                     }
@@ -348,7 +310,7 @@ if (!$result)
 
                                     bootbox
                                         .dialog({
-                                            title: 'Edit the user profile',
+                                            title: 'Edit institution',
                                             message: $('#institutionForm'),
                                             buttons: {
                                                 update: {
@@ -378,6 +340,33 @@ if (!$result)
                             },
                             {
                                 text: 'Delete',
+                                action: function ( e, dt, node, config ) {
+                                    var rowData = dt.row( { selected: true } ).data();
+                                    $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
+
+                                    bootbox
+                                        .confirm( {
+                                            title: 'Delete',
+                                            message: 'Are you sure?',
+                                            reorder: true,
+                                            buttons: {
+                                                confirm: {
+                                                    label: 'Delete',
+                                                    className: 'btn btn-success'
+                                                },
+                                                cancel: {
+                                                    label: 'No',
+                                                    className: 'btn btn-danger'
+                                                }
+                                            },
+                                            callback: function(result) {
+                                                if (result) {
+                                                    $('#form-update').val("delete").end();
+                                                    $('button#form-update').click();
+                                                }
+                                            }
+                                        } );
+                                },
                                 enabled: false
                             }
                         ]
@@ -400,4 +389,4 @@ if (!$result)
 
 </body>
 
-</html>
+</html>php

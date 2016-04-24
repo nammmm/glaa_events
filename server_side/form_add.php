@@ -10,43 +10,31 @@ if (isset($_POST['table'])) {
 
 	switch ($table) {
 		case 'Institutions':
-			$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
+			$institutionName = sanitizeMySQL($conn, $_POST['institutionName']);
 			$isGLAA = (sanitizeMySQL($conn, $_POST['isGLAA']) == "yes") ? 1 : 0;
 
-			$query = "UPDATE Institutions SET " .
-						"IsGLAA = $isGLAA " . 
-						"WHERE InstitutionID = $institutionID";
+			$query = "INSERT INTO Institutions (Institution, IsGLAA)" .
+                    "VALUES('$institutionName', '$isGLAA')";
 			break;
 		case 'Participants':
-			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
 			$firstName = sanitizeMySQL($conn, $_POST['firstName']);
 			$lastName = sanitizeMySQL($conn, $_POST['lastName']);
 			$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
 			$role = sanitizeMySQL($conn, $_POST['role']);
 			$title = sanitizeMySQL($conn, $_POST['title']);
 			$email = sanitizeMySQL($conn, $_POST['email']);
-			
-			$query = "UPDATE Participants SET " .
-						"FirstName = '$firstName', " . 
-						"LastName = '$lastName', " . 
-						"InstitutionID = $institutionID, " . 
-						"Role = '$role', " . 
-						"Title = '$title', " . 
-						"Email = '$email' " . 
-						"WHERE ParticipantID = $participantID";
+
+			$query = "INSERT INTO Participants (FirstName, LastName, InstitutionID, Role, Title, Email)" .
+                    "VALUES('$firstName', '$lastName', $institutionID, '$role', '$title', '$email')";
+			break;
 		case 'Events':
-			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
 			$name = sanitizeMySQL($conn, $_POST['name']);
 			$description = sanitizeMySQL($conn, $_POST['description']);
 			$academicYear = sanitizeMySQL($conn, $_POST['academicYear']);
 			$hostID = sanitizeMySQL($conn, $_POST['hostID']);
-			
-			$query = "UPDATE Events SET " .
-						"Name = '$name', " . 
-						"Description = '$description', " . 
-						"AcademicYear = '$academicYear', " . 
-						"HostID = $hostID " . 
-						"WHERE EventID = $eventID";
+
+			$query = "INSERT INTO Events (Name, Description, AcademicYear, HostID)" .
+                    "VALUES('$name', '$description', '$academicYear', $hostID)";
 			break;
 		default:
 			break;

@@ -14,9 +14,12 @@ function sanitizeMySQL($connection, $var)
 	return $var;
 }
 
-function eventsCheckYear($year)
+function getInstitution($connection, $id)
 {
-	
+	$query  = "SELECT Institution FROM Institutions WHERE InstitutionID = " . $id;
+	$result = $connection->query($query)->fetch_array(MYSQLI_ASSOC);
+	$name = $result['Institution'];
+	return $name;
 }
 
 function phpAlert($msg) {
