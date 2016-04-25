@@ -4,6 +4,7 @@ require_once 'helper.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
 
+// if (true) {
 if (isset($_POST['table'])) {
 	$table = sanitizeMySQL($conn, $_POST['table']);
 	$query = "";
@@ -14,7 +15,7 @@ if (isset($_POST['table'])) {
 			$isGLAA = (sanitizeMySQL($conn, $_POST['isGLAA']) == "yes") ? 1 : 0;
 
 			$query = "INSERT INTO Institutions (Institution, IsGLAA)" .
-                    "VALUES('$institutionName', '$isGLAA')";
+                    "VALUES('$institutionName', $isGLAA)";
 			break;
 		case 'Participants':
 			$firstName = sanitizeMySQL($conn, $_POST['firstName']);
@@ -35,6 +36,16 @@ if (isset($_POST['table'])) {
 
 			$query = "INSERT INTO Events (Name, Description, AcademicYear, HostID)" .
                     "VALUES('$name', '$description', '$academicYear', $hostID)";
+			break;
+		case 'Participations':
+			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+			$participantIDs = json_decode($_POST['participantIDs']);
+
+			$query = "INSERT INTO Participations (ParticipantID, EventID) VALUES ";
+			foreach ($participantIDs as $participantID)
+				$query .= "(" . $participantID . ", " . $eventID . "), "; 
+			$query = rtrim($query, ", ");
+			// print_r($query);
 			break;
 		default:
 			break;

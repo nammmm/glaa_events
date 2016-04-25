@@ -1,40 +1,72 @@
-<?php 
-require_once 'login.php';
+<?php
 require_once 'helper.php';
-$conn = new mysqli($hn, $un, $pw, $db);
-if ($conn->connect_error) die($conn->connect_error);
+// if (true) {
+if (isset($_POST['eventID']) && isset($_POST['institutionID'])) { 
+	require_once 'login.php';
+	$conn = new mysqli($hn, $un, $pw, $db);
+	if ($conn->connect_error) die($conn->connect_error);
 
-// $table = sanitizeMySQL($conn, $_POST['table']);
-$table = "Institutions";
+	$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+	$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
 
-$query  = "SELECT * FROM " . $table;
-$result = $conn->query($query);
-if (!$result)
-    die ("Database access failed: " . $conn->error);
+	if ($institutionID == "Select institution") {
+		$query = "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Participants pa LEFT JOIN Participations pp ON pp.ParticipantID = pa.ParticipantID WHERE pp.ParticipantID IS NULL) UNION " . "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Events ev " . 
+					"LEFT JOIN Participations pp " . 
+					"ON ev.EventID = pp.EventID " . 
+					"LEFT JOIN Participants pa " . 
+					"ON pp.ParticipantID = pa.ParticipantID " . 
+					"WHERE pp.EventID <> $eventID)";
+	}
+	else {
+		$query = "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Participants pa LEFT JOIN Participations pp ON pp.ParticipantID = pa.ParticipantID WHERE pp.ParticipantID IS NULL AND pa.InstitutionID = $institutionID) UNION " . "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Events ev " . 
+					"LEFT JOIN Participations pp " . 
+					"ON ev.EventID = pp.EventID " . 
+					"LEFT JOIN Participants pa " . 
+					"ON pp.ParticipantID = pa.ParticipantID " . 
+					"WHERE pp.EventID <> $eventID AND pa.InstitutionID = $institutionID)";
+	}
 
-// $boxes = array();
-$data = array();
-foreach ($result as $row ) {
-	// $boxes[] = array("empty" => "");
-    $data[] = $row;
+	$return = array();
+	if ($result = $conn->query($query)) {
+	    // fetch array
+	    while ($row=mysqli_fetch_assoc($result)) {
+	        $return[] = $row;
+	    }
+
+	    $result->close();
+	    $conn->close();
+
+	    echo(json_encode($return));
+	}
 }
 
-// $draw = $_POST["draw"];
-$recordsTotal = count($data);
-$recordsFiltered = $recordsTotal;
-// for ($j = 0 ; $j < $rows ; ++$j)
-// {
-//     $result->data_seek($j);
-//     $row = $result->fetch_array(MYSQLI_ASSOC);
-// }
+function getInstitution($connection, $id)
+{
+	$query  = "SELECT Institution FROM Institutions WHERE InstitutionID = " . $id;
+	$result = $connection->query($query)->fetch_array(MYSQLI_ASSOC);
+	$name = $result['Institution'];
+	return $name;
+}
 
-$response = array(
-	"recordsTotal" => $recordsTotal,
-	"recordsFiltered" => $recordsFiltered,
-	"data" => $data
-);
-echo json_encode($data);
-
-$result->close();
-$conn->close();
+function getInstitutionByType($connection, $id, $type)
+{
+	if ($type == "pa") {
+		$query  = "SELECT ins.Institution, pa.FirstName, pa.LastName " . 
+				"FROM Institutions ins " . 
+				"LEFT JOIN Participants pa " . 
+				"ON ins.InstitutionID = pa.InstitutionID " . 
+				"WHERE pa.ParticipantID = $id";
+	}
+	else if ($type == "ev") {
+		$query  = "SELECT ev.Name, ev.AcademicYear, ins.Institution " . 
+				"FROM Institutions ins " . 
+				"LEFT JOIN Events ev " . 
+				"ON ins.InstitutionID = ev.HostID " . 
+				"WHERE ev.EventID = $id";
+	}
+	$result = $connection->query($query)->fetch_array(MYSQLI_ASSOC);
+	if (!$result) 
+	    die ("Database access failed: " . $conn->error);
+	return $result;
+}
 ?>

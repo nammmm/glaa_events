@@ -144,7 +144,7 @@
                             <tbody>
                             <?php
                             require_once '../server_side/login.php';
-                            require_once '../server_side/helper.php';
+                            require_once '../server_side/server_processing.php';
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
@@ -191,8 +191,9 @@
                                 <input name="lastName" type="text" maxlength="30" class="form-control">
                             </div>
                         </div>
+
                         <div class="form-group">
-                            <label class="col-xs-4 control-label">Institution</label>
+                            <label class="col-xs-4 control-label">Institution:</label>
                             <div class="col-xs-8">
                                 <select name="institution-select" class="form-control">
                                     <option>Select institution</option>

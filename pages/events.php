@@ -128,7 +128,7 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-                        <div class="dataTable_wrapper">
+                    <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="eventsTable">
                             <thead>
                                 <tr>
@@ -143,7 +143,7 @@
                             <tbody>
                             <?php
                             require_once '../server_side/login.php';
-                            require_once '../server_side/helper.php';
+                            require_once '../server_side/server_processing.php';
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
@@ -190,14 +190,14 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-xs-4 control-label">Academic Year</label>
+                            <label class="col-xs-4 control-label">Academic Year:</label>
                             <div class="col-xs-8">
                                 <select name="year-select" class="form-control">
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-xs-4 control-label">Host Institution</label>
+                            <label class="col-xs-4 control-label">Host Institution:</label>
                             <div class="col-xs-8">
                                 <select name="institution-select" class="form-control">
                                     <option>Select institution</option>

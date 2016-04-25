@@ -48,6 +48,14 @@ if (isset($_POST['table'])) {
 						"HostID = $hostID " . 
 						"WHERE EventID = $eventID";
 			break;
+		case 'Participations':
+			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
+			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+			
+			$query = "UPDATE Participations SET " .
+						"EventID = '$eventID', " . 
+						"WHERE ParticipantID = $participantID";
+			break;
 		default:
 			break;
 	}

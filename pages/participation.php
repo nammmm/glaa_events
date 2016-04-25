@@ -128,13 +128,15 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-                        <div class="dataTable_wrapper">
+                    <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="participationsTable">
                             <thead>
                                 <tr>
+                                    <th></th>
+                                    <th>ParticipantID</th>
                                     <th>Institution</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
+                                    <th>Name</th>
+                                    <th>EventID</th>
                                     <th>Event</th>
                                     <th>Academic Year</th>
                                     <th>Host</th>
@@ -142,29 +144,112 @@
                             </thead>
                             <tbody>
                             <?php
+                            require_once '../server_side/login.php';
+                            require_once '../server_side/server_processing.php';
+                            $conn = new mysqli($hn, $un, $pw, $db);
+                            if ($conn->connect_error) die($conn->connect_error);
+
+                            $query  = "SELECT * FROM Participations";
+                            $result = $conn->query($query);
+                            if (!$result) 
+                                die ("Database access failed: " . $conn->error);
+
                             $rows = $result->num_rows;
                             for ($j = 0 ; $j < $rows ; ++$j)
                             {
                                 $result->data_seek($j);
                                 $row = $result->fetch_array(MYSQLI_ASSOC);
+                                $paInfo = getInstitutionByType($conn, $row['ParticipantID'], "pa");
+                                $evInfo = getInstitutionByType($conn, $row['EventID'], "ev");
                                 ?>
                                 <tr>
-                                    <td><? echo $row['Institution']; ?></td>
-                                    <td><? echo $row['IsGLAA'] ? "Yes" : "No"; ?></td>
-                                    <td><??></td>
-                                    <td><??></td>
-                                    <td><??></td>
-                                    <td><??></td>
+                                    <td></td>
+                                    <td><? echo $row['ParticipantID']; ?></td>
+                                    <td><? echo $paInfo['Institution']; ?></td>
+                                    <td><? echo $paInfo['FirstName'] . " " . $paInfo['LastName']; ?></td>
+                                    <td><? echo $row['EventID']; ?></td>
+                                    <td><? echo $evInfo['Name']; ?></td>
+                                    <td><? echo $evInfo['AcademicYear']; ?></td>
+                                    <td><? echo $evInfo['Institution']; ?></td>
                                 </tr>
                                 <?php
                             }
-                            $result->close();
-                            $conn->close();
                             ?>
                             </tbody>
                         </table>
                     </div>
                     <!-- /.table-responsive -->
+
+                    <!-- The form which is used to populate the item data -->
+                    <form id="participationForm" method="post" class="form-horizontal" style="display: none;">
+                        <input type="hidden" name="participantID">
+                        <input type="hidden" name="eventID">
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Event:</label>
+                            <div class="col-xs-8">
+                                <select name="event-select" class="form-control">
+                                    <option>Select event</option>
+                                    <?php
+                                    $query  = "SELECT EventID, Name FROM Events";
+                                    $result = $conn->query($query);
+                                    if (!$result) 
+                                        die ("Database access failed: " . $conn->error);
+
+                                    $rows = $result->num_rows;
+                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                    {
+                                        $result->data_seek($j);
+                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                        ?>
+                                        <option value="<? echo $row['EventID']; ?>" ><? echo $row['Name']; ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">Institution:</label>
+                            <div class="col-xs-8">
+                                <select name="institution-select" class="form-control">
+                                    <option>Select institution</option>
+                                    <?php
+                                    $query  = "SELECT InstitutionID, Institution FROM Institutions";
+                                    $result = $conn->query($query);
+                                    if (!$result) 
+                                        die ("Database access failed: " . $conn->error);
+
+                                    $rows = $result->num_rows;
+                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                    {
+                                        $result->data_seek($j);
+                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                        ?>
+                                        <option value="<? echo $row['InstitutionID']; ?>" ><? echo $row['Institution']; ?></option>
+                                        <?php
+                                    }
+                                    $result->close();
+                                    $conn->close();
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="participants-select-group" class="form-group">
+                            <label class="col-xs-4 control-label">Participants:</label>
+                            <div class="col-xs-8">
+                                <select name="participants-select" multiple class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div id="participant-group" class="form-group" style="display: none">
+                            <label class="col-xs-4 control-label">Participant:</label>
+                            <div class="col-xs-8">
+                                <input name="participant" type="text" class="form-control" disabled="true">
+                            </div>
+                        </div>
+                        <button type="submit" id="form-update" class="hidden"></button>
+                    </form>
+                    <!-- /hidden form -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -187,6 +272,19 @@
     <!-- DataTables JavaScript -->
     <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
     <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
+    
+    <!-- DataTables Selects -->
+    <script src="https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../js/bootboxjs/bootbox.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="../js/scripts.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
@@ -194,11 +292,209 @@
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
-            $('#participationsTable').DataTable({
+            var table = $('#participationsTable').DataTable( {
+                "lengthChange": false,
                 "language": {
-                  "emptyTable": "There is no participation record at this point"
+                    "emptyTable": "There is no participation at this point"
                 },
-                responsive: true
+                columnDefs: [ 
+                    {
+                        orderable: false,
+                        className: 'select-checkbox',
+                        targets: 0
+                    },
+                    {   
+                        visible: false,
+                        targets: [1, 4]
+                    } 
+                ],
+                select: {
+                    style: 'os'
+                },
+                order: [[ 1, 'asc' ]],
+                responsive: true,
+                initComplete: function(){
+                    var api = this.api();
+                    new $.fn.dataTable.Buttons(api, {
+                        buttons: [
+                            {
+                                text: 'New',
+                                action: function ( e, dt, node, config ) {
+                                    bootbox
+                                        .dialog({
+                                            title: 'Add participation',
+                                            message: $('#participationForm'),
+                                            buttons: {
+                                                add: {
+                                                    label: 'Add',
+                                                    className: 'btn btn-success',
+                                                    callback: function() {
+                                                        $('#form-update').val("add").end();
+                                                        $('button#form-update').click();
+                                                    }
+                                                },
+                                                cancel: {
+                                                    label: 'Cancel',
+                                                    className: 'btn btn-default'
+                                                }
+                                            },
+                                            show: false
+                                        })
+                                        .on('show.bs.modal', function() {
+                                            $('#participationForm').show();
+                                        })
+                                        .on('hide.bs.modal', function(e) {
+                                            $('#participationForm').hide().appendTo('body');
+                                        })
+                                        .modal('show');
+                                }
+                            },
+                            {
+                                text: 'Edit',
+                                action: function ( e, dt, node, config ) {
+                                    var rowData = dt.row( { selected: true } ).data();
+                                    $('#participationForm').find('[name="participantID"]').val(rowData[1]).end();
+                                    $('select[name=institution-select] option').filter(function() {
+                                        return $(this).text() == rowData[2]; 
+                                    }).prop('selected', true);
+                                    $('select[name=institution-select]').prop('disabled', true);
+                                    $('#participants-select-group').hide();
+                                    $('#participant-group').show();
+                                    $('#participationForm').find('[name="participant"]').val(rowData[3]).end();
+                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
+                                    $('select[name=event-select] option').filter(function() {
+                                        return $(this).text() == rowData[5]; 
+                                    }).prop('selected', true);
+                                    
+                                    bootbox
+                                        .dialog({
+                                            title: 'Edit participation',
+                                            message: $('#participationForm'),
+                                            buttons: {
+                                                update: {
+                                                    label: 'Update',
+                                                    className: 'btn btn-primary',
+                                                    callback: function() {
+                                                        $('#form-update').val("update").end();
+                                                        $('button#form-update').click();
+                                                    }
+                                                },
+                                                cancel: {
+                                                    label: 'Cancel',
+                                                    className: 'btn btn-default'
+                                                }
+                                            },
+                                            show: false
+                                        })
+                                        .on('show.bs.modal', function() {
+                                            $('#participationForm').show();
+                                        })
+                                        .on('hide.bs.modal', function(e) {
+                                            $('#participationForm').hide().appendTo('body');
+                                        })
+                                        .modal('show');
+                                },
+                                enabled: false
+                            },
+                            {
+                                text: 'Delete',
+                                action: function ( e, dt, node, config ) {
+                                    var rowData = dt.row( { selected: true } ).data();
+                                    $('#participationForm').find('[name="participantID"]').val(rowData[1]).end();
+                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
+
+                                    bootbox
+                                        .confirm( {
+                                            title: 'Delete',
+                                            message: 'Are you sure?',
+                                            reorder: true,
+                                            buttons: {
+                                                confirm: {
+                                                    label: 'Delete',
+                                                    className: 'btn btn-success'
+                                                },
+                                                cancel: {
+                                                    label: 'No',
+                                                    className: 'btn btn-danger'
+                                                }
+                                            },
+                                            callback: function(result) {
+                                                if (result) {
+                                                    $('#form-update').val("delete").end();
+                                                    $('button#form-update').click();
+                                                }
+                                            }
+                                        } );
+                                },
+                                enabled: false
+                            }
+                        ]
+                    });
+                    api.buttons().container().appendTo( '#' + api.table().container().id + ' .col-sm-6:eq(0)' );  
+                }
+            } );
+
+            table.on( 'select', function () {
+                table.button( 1 ).enable();
+                table.button( 2 ).enable();
+            } );
+
+            table.on( 'deselect', function () {
+                table.button( 1 ).disable();
+                table.button( 2 ).disable();
+            } );
+
+            $('select[name=event-select]').change(function() {
+                var ev_selected = $('select[name=event-select]').val();
+                var ins_selected = $('select[name=institution-select]').val();
+                if (ev_selected !== "Select event") {
+                    var formdata = {
+                            eventID: ev_selected,
+                            institutionID: ins_selected
+                    };
+                    
+                    $.ajax( {
+                        type: 'POST',
+                        url: '../server_side/server_processing.php',
+                        data: formdata,
+                        dataType: 'JSON',
+                        success: function(data) {
+                            $('select[name=participants-select]').html('');
+                            var dataCount = data.length;
+                            if (dataCount > 4) {
+                                $('select[name=participants-select]').size('8');
+                            }
+                            $.each(data, function(){
+                                $('select[name=participants-select]').append('<option value="'+ this.ParticipantID +'">'+ this.FirstName + ' ' + this.LastName +'</option>')
+                            } );
+                        }
+                    } );
+                }
+            });
+
+            $('select[name=institution-select]').change(function() {
+                var pa_selects = $('select[name=participants-select] option').length;
+                var ins_selected = $('select[name=institution-select]').val();
+                var ev_selected = $('select[name=event-select]').val();
+                if (pa_selects != 0 && ev_selected !== "Select event" && ins_selected !== "Select institution") {
+                    var formdata = {
+                            eventID: ev_selected,
+                            institutionID: ins_selected
+                    };
+                    
+                    $.ajax( {
+                        type: 'POST',
+                        url: '../server_side/server_processing.php',
+                        data: formdata,
+                        dataType: 'JSON',
+                        success: function(data) {
+                            $('select[name=participants-select]').html('');
+                            $.each(data, function(){
+                                $('select[name=participants-select]').append('<option value="'+ this.ParticipantID +'">'+ this.FirstName + ' ' + this.LastName +'</option>')
+                            } );
+                        }
+                    } );
+                }
             });
         });
     </script>

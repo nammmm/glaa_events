@@ -11,18 +11,28 @@ if (isset($_POST['table'])) {
 	switch ($table) {
 		case 'Institutions':
 			$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
+
 			$query = "DELETE FROM Institutions " . 
 						"WHERE InstitutionID = $institutionID";
 			break;
 		case 'Participants':
 			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
+
 			$query = "DELETE FROM Participants " . 
 						"WHERE ParticipantID = $participantID";
 			break;
 		case 'Events':
 			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+
 			$query = "DELETE FROM Events " . 
 						"WHERE EventID = $eventID";
+			break;
+		case 'Participations':
+			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
+			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+
+			$query = "DELETE FROM Participations " . 
+						"WHERE ParticipantID = $participantID AND EventID = $eventID";
 			break;
 		default:
 			break;
