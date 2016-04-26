@@ -26,6 +26,10 @@ $("#participationForm").submit(function(e) {
     doAction('#participationForm');
 } );
 
+$("#reportForm").submit(function(e) {
+    saveReportFilters();
+} );
+
 // Check operation type
 function doAction(form) {
     var clickType = $('#form-update').val();
@@ -37,6 +41,9 @@ function doAction(form) {
     }
     else if (clickType === "delete") {
         deleteForm(form);
+    }
+    else if (clickType === "csv") {
+
     }
 }
 
@@ -231,6 +238,46 @@ function deleteForm(form) {
 }
 
 /***************************************************************************
+ *  Report page functions
+ ***************************************************************************/
+
+function saveReportFilters() {
+    localStorage.setItem('institution_select', $('select[name=institution_select]').val());
+    localStorage.setItem('event_select', $('select[name=event_select]').val());
+    localStorage.setItem('year_select', $('select[name=year_select]').val());
+    localStorage.setItem('host_select', $('select[name=host_select]').val());
+    localStorage.setItem('scrollPosition', $(window).scrollTop());
+}
+
+function loadReportFilters() {
+    var selectIns = localStorage.getItem('institution_select');
+    var selectEvent = localStorage.getItem('event_select');
+    var selectYear = localStorage.getItem('year_select');
+    var selectHost = localStorage.getItem('host_select');
+    var scrollPosition = localStorage.getItem('scrollPosition');
+    if (selectIns != 'empty') {
+        $('select[name=institution_select] option').filter(function() {
+            return $(this).val() == selectIns; 
+        }).prop('selected', true);
+        $('select[name=event_select] option').filter(function() {
+            return $(this).val() == selectEvent; 
+        }).prop('selected', true);
+        $('select[name=year_select] option').filter(function() {
+            return $(this).val() == selectYear; 
+        }).prop('selected', true);
+        $('select[name=host_select] option').filter(function() {
+            return $(this).val() == selectHost; 
+        }).prop('selected', true);
+        $(window).scrollTop(scrollPosition);
+    }
+    localStorage.setItem('institution_select', 'All');
+    localStorage.setItem('event_select', 'All');
+    localStorage.setItem('year_select', 'All');
+    localStorage.setItem('host_select', 'All');
+    localStorage.setItem('scrollPosition', 'empty');
+}
+
+/***************************************************************************
  *  Custom jQuery validator methods
  ***************************************************************************/
 
@@ -256,6 +303,7 @@ $.validator.addMethod(
 /***************************************************************************
  *  Alert setting function
  ***************************************************************************/
+
 function checkAlert() {
     var succeed = localStorage.getItem('form');
     var msg = localStorage.getItem('msg');

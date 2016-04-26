@@ -19,9 +19,10 @@
 
     <!-- DataTables CSS -->
     <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">
 
     <!-- DataTables Responsive CSS -->
-    <link href="../bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+    <link href="../bower_components/datatables-responsive/css/responsive.dataTables.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
@@ -34,7 +35,7 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
+    <![endif]-->
 
 </head>
 
@@ -63,19 +64,7 @@
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Report<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="report.php">Report 1</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 2</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 3</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="report.php"><i class="fa fa-bar-chart-o fa-fw"></i> Report</a>
                         </li>
 
                         <li>
@@ -91,7 +80,7 @@
                         </li>
 
                         <li>
-                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
+                            <a href="participations.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>
@@ -126,36 +115,183 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Filters
+                        </div>
+                        <div class="panel-body">
+                            <form id="reportForm" method="post" class="form-horizontal">
+                                <?php
+                                require_once '../server_side/login.php';
+                                require_once '../server_side/server_processing.php';
+                                $conn = new mysqli($hn, $un, $pw, $db);
+                                if ($conn->connect_error) die($conn->connect_error);
+                                ?>
+                                <div class="row">
+                                    <div class="col-lg-6">
+
+                                        <!-- Choose Institution -->
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Choose institution:</label>
+                                            <div class="col-xs-8">
+                                                <select name="institution_select" class="form-control">
+                                                    <option>All</option>
+                                                    <?php
+                                                    $query  = "SELECT InstitutionID, Institution FROM Institutions";
+                                                    $result = $conn->query($query);
+                                                    if (!$result) 
+                                                        die ("Database access failed: " . $conn->error);
+
+                                                    $rows = $result->num_rows;
+                                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                                    {
+                                                        $result->data_seek($j);
+                                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                                        ?>
+                                                        <option value="<? echo $row['InstitutionID']; ?>" ><? echo $row['Institution']; ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Choose Year -->
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Choose year:</label>
+                                            <div class="col-xs-8">
+                                                <select name="year_select" class="form-control">
+                                                    <option>All</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.col-lg-6 (nested) -->
+                                    <div class="col-lg-6">
+
+                                        <!-- Choose Event -->
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Choose event:</label>
+                                            <div class="col-xs-8">
+                                                <select name="event_select" class="form-control">
+                                                    <option>All</option>
+                                                    <?php
+                                                    $query  = "SELECT EventID, Name FROM Events";
+                                                    $result = $conn->query($query);
+                                                    if (!$result) 
+                                                        die ("Database access failed: " . $conn->error);
+
+                                                    $rows = $result->num_rows;
+                                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                                    {
+                                                        $result->data_seek($j);
+                                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                                        ?>
+                                                        <option value="<? echo $row['EventID']; ?>" ><? echo $row['Name']; ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Choose host -->
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Choose host:</label>
+                                            <div class="col-xs-8">
+                                                <select name="host_select" class="form-control">
+                                                    <option>All</option>
+                                                    <?php
+                                                    $query  = "SELECT ins.InstitutionID, ins.Institution FROM Institutions ins LEFT JOIN Events ev ON ev.HostID = ins.InstitutionID WHERE ev.HostID IS NOT NULL";
+                                                    $result = $conn->query($query);
+                                                    if (!$result) 
+                                                        die ("Database access failed: " . $conn->error);
+
+                                                    $rows = $result->num_rows;
+                                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                                    {
+                                                        $result->data_seek($j);
+                                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                                        ?>
+                                                        <option value="<? echo $row['InstitutionID']; ?>" ><? echo $row['Institution']; ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.col-lg-6 (nested) -->
+
+                                    <div class="col-lg-12 text-center">
+                                        <button type="submit" class="btn btn-primary" type="button"><i class="fa fa-search"></i> Search</button>
+                                        <button type="submit" id="form-reset" class="btn btn-default" type="button"> Reset</button>
+                                    </div>
+                                    
+                                </div>
+                                <!-- /.row (nested) -->
+                            </form>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+
+                    <!-- Alert Placeholder-->
+                    <div id="alert-holder" style="display: none"></div>
+
                     <div class="dataTable_wrapper">
-                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <table class="table table-striped table-bordered table-hover" id="reportTable">
                             <thead>
                                 <tr>
-                                    <th>Event ID</th>
-                                    <th>Name</th>
+                                    <th>Institution</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Role</th>
+                                    <th>Title</th>
+                                    <th>Email</th>
+                                    <th>Event</th>
                                     <th>Description</th>
-                                    <th>Year</th>
+                                    <th>Academic Year</th>
                                     <th>Host</th>
                                 </tr>
                             </thead>
                             <tbody>
+                            <?php
+                            $query = "SELECT * FROM Participations";
+                            if (isset($_POST['institution_select']) || isset($_POST['event_select']) || isset($_POST['year_select']) || isset($_POST['host_select'])) {
+                                $query = updateReport();
+                            }
+                            $result = $conn->query($query);
+                            if (!$result) 
+                                die ("Database access failed: " . $conn->error);
+
+                            $rows = $result->num_rows;
+                            for ($j = 0 ; $j < $rows ; ++$j)
+                            {
+                                $result->data_seek($j);
+                                $row = $result->fetch_array(MYSQLI_ASSOC);
+                                $paInfo = getInstitutionByType($conn, $row['ParticipantID'], "paAll");
+                                $evInfo = getInstitutionByType($conn, $row['EventID'], "evAll");
+                                ?>
                                 <tr>
-                                    <td>1</td>
-                                    <td>Global Alliance Liaisons Meeting</td>
-                                    <td>The first meeting of the Alliance Liaisons</td>
-                                    <td>2015-16</td>
-                                    <td>John Cabot University</td>
+                                    <td><? echo $paInfo['Institution']; ?></td>
+                                    <td><? echo $paInfo['FirstName']; ?></td>
+                                    <td><? echo $paInfo['LastName'] ?></td>
+                                    <td><? echo $paInfo['Role'] ?></td>
+                                    <td><? echo $paInfo['Title'] ?></td>
+                                    <td><? echo $paInfo['Email'] ?></td>
+                                    <td><? echo $evInfo['Name']; ?></td>
+                                    <td><? echo $evInfo['Description']; ?></td>
+                                    <td><? echo $evInfo['AcademicYear']; ?></td>
+                                    <td><? echo $evInfo['Host']; ?></td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Event 2</td>
-                                    <td>Test</td>
-                                    <td>2016-17</td>
-                                    <td>The College of Wooster</td>
-                                </tr>
+                                <?php
+                            }
+                            ?>   
                             </tbody>
                         </table>
                     </div>
-                    <!-- todoTable.php -->
+                    <!-- /.table-responsive -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -178,16 +314,89 @@
     <!-- DataTables JavaScript -->
     <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
     <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../js/bootboxjs/bootbox.min.js"></script>
+
+    <!-- jQuery Validation JavaScript -->
+    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="../js/scripts.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
+    <!-- Populate Academic Year Selector -->
+    <script>
+        for (i = new Date().getFullYear(); i >= 2000; i--) {
+            $('select[name=year_select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+        }
+    </script>
+
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
-        $(document).ready(function() {
-            $('#dataTables-example').DataTable({
-                responsive: true
+        $(document).ready(function() {            
+            loadReportFilters();
+            $('#form-reset').click(function() {
+                $('select[name=institution_select] option').filter(function() {
+                    return $(this).text() == "All"; 
+                }).prop('selected', true);
+                $('select[name=event_select] option').filter(function() {
+                    return $(this).text() == "All"; 
+                }).prop('selected', true);
+                $('select[name=year_select] option').filter(function() {
+                    return $(this).text() == "All"; 
+                }).prop('selected', true);
+                $('select[name=host_select] option').filter(function() {
+                    return $(this).text() == "All"; 
+                }).prop('selected', true);
             });
+            var table = $('#reportTable').DataTable( {
+                "lengthChange": false,
+                "language": {
+                    "emptyTable": "No record available"
+                },
+                columnDefs: [
+                    {   
+                        visible: false,
+                        targets: [3, 4, 5, 7]
+                    } 
+                ],
+                "autoWidth": false,
+                "columns": [
+                    { "width": "17%" }, 
+                    { "width": "12%" },
+                    { "width": "12%" },
+                    { "width": "0%" },
+                    { "width": "0%" },
+                    { "width": "0%" },
+                    { "width": "25%" },
+                    { "width": "0%" },
+                    { "width": "5%" },
+                    { "width": "17%" }
+                ],
+                order: [[ 1, 'asc' ]],
+                responsive: true,
+                initComplete: function(){
+                    var api = this.api();
+                    new $.fn.dataTable.Buttons(api, {
+                        buttons: [
+                            {
+                                extend: 'csvHtml5',
+                                text: 'Download as CSV',
+                                className: 'btn btn-success'
+                            }
+                        ]
+                    });
+                    api.buttons().container().appendTo( '#' + api.table().container().id + ' .col-sm-6:eq(0)' );  
+                }
+            } );
         });
     </script>
 

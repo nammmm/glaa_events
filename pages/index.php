@@ -57,19 +57,7 @@
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Report<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="report.php">Report 1</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 2</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 3</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="report.php"><i class="fa fa-bar-chart-o fa-fw"></i> Report</a>
                         </li>
 
                         <li>
@@ -85,7 +73,7 @@
                         </li>
 
                         <li>
-                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
+                            <a href="participations.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>
@@ -118,6 +106,151 @@
                         <h1 class="page-header">Overview</h1>
                     </div>
                     <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                    <?php
+                    require_once '../server_side/login.php';
+                    require_once '../server_side/server_processing.php';
+                    $conn = new mysqli($hn, $un, $pw, $db);
+                    if ($conn->connect_error) die($conn->connect_error);
+                    ?>
+
+                    <!-- Institutions -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-red">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-university fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <?php
+                                        $query  = "SELECT COUNT(*) as total FROM Institutions";
+                                        $result = $conn->query($query);
+                                        if (!$result) 
+                                            die ("Database access failed: " . $conn->error);
+                                        $data=mysqli_fetch_assoc($result);
+                                        ?>
+                                        <div class="huge"><? echo $data['total']; ?></div>
+                                        <div>Institutions</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="institutions.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Participants -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-green">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-user fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <?php
+                                        $query  = "SELECT COUNT(*) as total FROM Participants";
+                                        $result = $conn->query($query);
+                                        if (!$result) 
+                                            die ("Database access failed: " . $conn->error);
+                                        $data=mysqli_fetch_assoc($result);
+                                        ?>
+                                        <div class="huge"><? echo $data['total']; ?></div>
+                                        <div>Participants</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="participants.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Events -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-yellow">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-list-alt fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <?php
+                                        $query  = "SELECT COUNT(*) as total FROM Events";
+                                        $result = $conn->query($query);
+                                        if (!$result) 
+                                            die ("Database access failed: " . $conn->error);
+                                        $data=mysqli_fetch_assoc($result);
+                                        ?>
+                                        <div class="huge"><? echo $data['total']; ?></div>
+                                        <div>Events</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="events.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Participations -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-check-square-o fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <?php
+                                        $query  = "SELECT COUNT(*) as total FROM Participations";
+                                        $result = $conn->query($query);
+                                        if (!$result) 
+                                            die ("Database access failed: " . $conn->error);
+                                        $data=mysqli_fetch_assoc($result);
+                                        ?>
+                                        <div class="huge"><? echo $data['total']; ?></div>
+                                        <div>Participations</div>
+                                        <?php
+                                        $result->close();
+                                        $conn->close();
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="participations.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2"></div>
+
+                    <div class="col-lg-8 text-center">
+                        <a href="report.php" class="btn btn-lg btn-info btn-block" type="button"><i class="fa fa-pencil"></i> Generate Report</a>
+                    </div>
+                    
+                    <div class="col-lg-2"></div>
                 </div>
                 <!-- /.row -->
             </div>
