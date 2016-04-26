@@ -128,6 +128,10 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    
+                    <!-- Alert Placeholder-->
+                    <div id="alert-holder" style="display: none"></div>
+
                     <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="eventsTable">
                             <thead>
@@ -180,13 +184,13 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Name:</label>
                             <div class="col-xs-8">
-                                <input name="name" type="text" maxlength="100" class="form-control">
+                                <input name="name" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Description:</label>
                             <div class="col-xs-8">
-                                <textarea name="description" maxlength="255" class="form-control" rows="3" placeholder="Enter description. Maximum 255 characters"></textarea>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Optional"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -258,6 +262,9 @@
     <!-- Bootbox JavaScript -->
     <script src="../js/bootboxjs/bootbox.min.js"></script>
 
+    <!-- jQuery Validation JavaScript -->
+    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
@@ -274,11 +281,21 @@
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
+            checkAlert();
             var table = $('#eventsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
                     "emptyTable": "There is no event at this point"
                 },
+                "autoWidth": false,
+                "columns": [ 
+                    { "width": "5%" }, 
+                    { "width": "0%" },
+                    { "width": "17%" }, 
+                    { "width": "25%" }, 
+                    { "width": "5%" },
+                    { "width": "17%" }
+                ],
                 columnDefs: [ 
                     {
                         orderable: false,
@@ -344,7 +361,7 @@
                                     $('select[name=institution-select] option').filter(function() {
                                         return $(this).text() == rowData[5]; 
                                     }).prop('selected', true);
-                                    // alert(rowData); // ,1,Event1,this is a test,2016-17,Albion College
+
                                     bootbox
                                         .dialog({
                                             title: 'Edit event',
@@ -380,6 +397,7 @@
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#eventForm').find('[name="id"]').val(rowData[1]).end();
+                                    $('#eventForm').find('[name="name"]').val(rowData[2]).end();
 
                                     bootbox
                                         .confirm( {
@@ -421,6 +439,37 @@
                 table.button( 1 ).disable();
                 table.button( 2 ).disable();
             } );
+
+            $('#eventForm').validate({
+                rules: {
+                    name: {
+                        maxlength: 100,
+                        required: true,
+                        regex: /^[A-Za-z\s]{1,}$/
+                    },
+                    description: {
+                        maxlength: 255
+                    },
+                    'institution-select': {
+                        valueNotEquals: "Select institution"
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
         });
     </script>
 

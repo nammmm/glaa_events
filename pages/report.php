@@ -79,55 +79,19 @@
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-university fa-fw"></i> Institutions<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="institutions.php">View Institutions</a>
-                                </li>
-                                <li>
-                                    <a href="add_institution.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="institutions.php"><i class="fa fa-university fa-fw"></i> Institutions</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-user fa-fw"></i> Participants<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participants.php">View Participants</a>
-                                </li>
-                                <li>
-                                    <a href="create_participant.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participants.php"><i class="fa fa-user fa-fw"></i> Participants</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-list-alt fa-fw"></i> Events<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="events.php">View Events</a>
-                                </li>
-                                <li>
-                                    <a href="create_event.php">Create New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="events.php"><i class="fa fa-list-alt fa-fw"></i> Events</a>
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-check-square-o fa-fw"></i> Participation<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="participation.php">View Participation</a>
-                                </li>
-                                <li>
-                                    <a href="add_participation.php">Add New</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>

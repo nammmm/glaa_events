@@ -128,7 +128,11 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
-                        <div class="dataTable_wrapper">
+                    
+                    <!-- Alert Placeholder-->
+                    <div id="alert-holder" style="display: none"></div>
+
+                    <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="participantsTable">
                             <thead>
                                 <tr>
@@ -182,13 +186,13 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">First Name:</label>
                             <div class="col-xs-8">
-                                <input name="firstName" type="text" maxlength="30" class="form-control">
+                                <input name="firstName" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Last Name:</label>
                             <div class="col-xs-8">
-                                <input name="lastName" type="text" maxlength="30" class="form-control">
+                                <input name="lastName" type="text" class="form-control">
                             </div>
                         </div>
 
@@ -221,19 +225,19 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Role:</label>
                             <div class="col-xs-8">
-                                <input name="role" type="text" maxlength="100" class="form-control">
+                                <input name="role" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Title:</label>
                             <div class="col-xs-8">
-                                <input name="title" type="text" maxlength="100" class="form-control">
+                                <input name="title" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Email:</label>
                             <div class="col-xs-8">
-                                <input name="email" type="text" maxlength="120" class="form-control">
+                                <input name="email" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -272,6 +276,9 @@
     <!-- Bootbox JavaScript -->
     <script src="../js/bootboxjs/bootbox.min.js"></script>
 
+    <!-- jQuery Validation JavaScript -->
+    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
@@ -281,11 +288,22 @@
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
+            checkAlert();
             var table = $('#participantsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
                     "emptyTable": "There is no participant at this point"
                 },
+                "autoWidth": false,
+                "columns": [ 
+                    { "width": "5%" }, 
+                    { "width": "0%" },
+                    { "width": "15%" }, 
+                    { "width": "15%" }, 
+                    { "width": "13%" }, 
+                    { "width": "27%" }, 
+                    { "width": "17%" }
+                ],
                 columnDefs: [ 
                     {
                         orderable: false,
@@ -318,6 +336,9 @@
                                                     label: 'Add',
                                                     className: 'btn btn-success',
                                                     callback: function() {
+                                                        if (!$('#participantForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("add").end();
                                                         $('button#form-update').click();
                                                     }
@@ -351,7 +372,7 @@
                                     $('#participantForm').find('[name="role"]').val(rowData[4]).end();
                                     $('#participantForm').find('[name="title"]').val(rowData[5]).end();
                                     $('#participantForm').find('[name="email"]').val(rowData[6]).end();
-                                    // alert(rowData[1]);
+
                                     bootbox
                                         .dialog({
                                             title: 'Edit participant',
@@ -361,6 +382,9 @@
                                                     label: 'Update',
                                                     className: 'btn btn-primary',
                                                     callback: function() {
+                                                        if (!$('#participantForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("update").end();
                                                         $('button#form-update').click();
                                                     }
@@ -387,6 +411,8 @@
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#participantForm').find('[name="id"]').val(rowData[1]).end();
+                                    $('#participantForm').find('[name="firstName"]').val(rowData[2].substr(0,rowData[2].indexOf(' '))).end();
+                                    $('#participantForm').find('[name="lastName"]').val(rowData[2].substr(rowData[2].indexOf(' ')+1)).end();
 
                                     bootbox
                                         .confirm( {
@@ -428,6 +454,51 @@
                 table.button( 1 ).disable();
                 table.button( 2 ).disable();
             } );
+
+            $('#participantForm').validate({
+                rules: {
+                    firstName: {
+                        maxlength: 30,
+                        required: true,
+                        regex: /^[A-Za-z]{1,}$/
+                    },
+                    lastName: {
+                        maxlength: 30,
+                        required: true,
+                        regex: /^[A-Za-z]{1,}$/
+                    },
+                    'institution-select': {
+                        valueNotEquals: "Select institution"
+                    },
+                    role: {
+                        maxlength: 100,
+                        regex: /^[A-Za-z\s]{1,}$/
+                    },
+                    title: {
+                        maxlength: 100,
+                        regex: /^[A-Za-z\s]{1,}$/
+                    },
+                    email: {
+                        maxlength: 120,
+                        regex: /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
         });
     </script>
 

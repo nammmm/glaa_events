@@ -128,6 +128,10 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    
+                    <!-- Alert Placeholder-->
+                    <div id="alert-holder" style="display: none"></div>
+
                     <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="participationsTable">
                             <thead>
@@ -283,6 +287,9 @@
     <!-- Bootbox JavaScript -->
     <script src="../js/bootboxjs/bootbox.min.js"></script>
 
+    <!-- jQuery Validation JavaScript -->
+    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
@@ -292,11 +299,23 @@
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
+            checkAlert();
             var table = $('#participationsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
                     "emptyTable": "There is no participation at this point"
                 },
+                "autoWidth": false,
+                "columns": [ 
+                    { "width": "5%" }, 
+                    { "width": "0%" },
+                    { "width": "17%" }, 
+                    { "width": "15%" }, 
+                    { "width": "0%" },
+                    { "width": "25%" },
+                    { "width": "5%" },
+                    { "width": "17%" }
+                ],
                 columnDefs: [ 
                     {
                         orderable: false,
@@ -365,7 +384,7 @@
                                     $('select[name=event-select] option').filter(function() {
                                         return $(this).text() == rowData[5]; 
                                     }).prop('selected', true);
-                                    
+
                                     bootbox
                                         .dialog({
                                             title: 'Edit participation',
@@ -443,6 +462,32 @@
                 table.button( 1 ).disable();
                 table.button( 2 ).disable();
             } );
+
+            $('#participationForm').validate({
+                rules: {
+                    'event-select': {
+                        valueNotEquals: "Select event"
+                    },
+                    'institution-select': {
+                        valueNotEquals: "Select institution"
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
 
             $('select[name=event-select]').change(function() {
                 var ev_selected = $('select[name=event-select]').val();

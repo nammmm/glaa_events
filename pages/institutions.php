@@ -129,6 +129,10 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    
+                    <!-- Alert Placeholder-->
+                    <div id="alert-holder" style="display: none"></div>
+
                     <div class="dataTable_wrapper">
                         <table class="table table-striped table-bordered table-hover" id="institutionsTable">
                             <thead>
@@ -178,7 +182,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution Name:</label>
                             <div class="col-xs-8">
-                                <input name="institutionName" type="text" maxlength="100" class="form-control">
+                                <input name="institutionName" type="text" class="form-control" placeholder="Input can only contain characters and space">
                             </div>
                         </div>
                         <div class="form-group">
@@ -228,6 +232,9 @@
     <!-- Bootbox JavaScript -->
     <script src="../js/bootboxjs/bootbox.min.js"></script>
 
+    <!-- jQuery Validation JavaScript -->
+    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
@@ -237,6 +244,7 @@
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {
+            checkAlert();
             var table = $('#institutionsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
@@ -274,6 +282,9 @@
                                                     label: 'Add',
                                                     className: 'btn btn-success',
                                                     callback: function() {
+                                                        if (!$('#institutionForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("add").end();
                                                         $('button#form-update').click();
                                                     }
@@ -317,6 +328,9 @@
                                                     label: 'Update',
                                                     className: 'btn btn-primary',
                                                     callback: function() {
+                                                        if (!$('#institutionForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("update").end();
                                                         $('button#form-update').click();
                                                     }
@@ -343,6 +357,7 @@
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
+                                    $('#institutionForm').find('[name="institutionName"]').val(rowData[2]).end();
 
                                     bootbox
                                         .confirm( {
@@ -384,6 +399,34 @@
                 table.button( 1 ).disable();
                 table.button( 2 ).disable();
             } );
+
+            $('#institutionForm').validate({
+                rules: {
+                    institutionName: {
+                        maxlength: 100,
+                        required: true,
+                        regex: /^[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/
+                    },
+                    optionsRadiosInline: {
+                        required: true
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
         });
     </script>
 
