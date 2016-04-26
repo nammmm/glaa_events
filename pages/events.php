@@ -65,19 +65,7 @@
                         </li>
 
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Report<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="report.php">Report 1</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 2</a>
-                                </li>
-                                <li>
-                                    <a href="report.php">Report 3</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                            <a href="report.php"><i class="fa fa-bar-chart-o fa-fw"></i> Report</a>
                         </li>
 
                         <li>
@@ -93,7 +81,7 @@
                         </li>
 
                         <li>
-                            <a href="participation.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
+                            <a href="participations.php"><i class="fa fa-check-square-o fa-fw"></i> Participation</a>
                         </li>
 
                         <li>
@@ -328,6 +316,9 @@
                                                     label: 'Add',
                                                     className: 'btn btn-success',
                                                     callback: function() {
+                                                        if (!$('#eventForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("add").end();
                                                         $('button#form-update').click();
                                                     }
@@ -371,6 +362,9 @@
                                                     label: 'Update',
                                                     className: 'btn btn-primary',
                                                     callback: function() {
+                                                        if (!$('#eventForm').valid()) {
+                                                            return false;
+                                                        }
                                                         $('#form-update').val("update").end();
                                                         $('button#form-update').click();
                                                     }

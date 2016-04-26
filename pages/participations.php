@@ -109,7 +109,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Participants</h1>                   
+                    <h1 class="page-header">Participations</h1>                   
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -121,16 +121,17 @@
                     <div id="alert-holder" style="display: none"></div>
 
                     <div class="dataTable_wrapper">
-                        <table class="table table-striped table-bordered table-hover" id="participantsTable">
+                        <table class="table table-striped table-bordered table-hover" id="participationsTable">
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>ID</th>
-                                    <th>Name</th>
+                                    <th>ParticipantID</th>
                                     <th>Institution</th>
-                                    <th>Role</th>
-                                    <th>Title</th>
-                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>EventID</th>
+                                    <th>Event</th>
+                                    <th>Academic Year</th>
+                                    <th>Host</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -140,7 +141,7 @@
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
-                            $query  = "SELECT * FROM Participants";
+                            $query  = "SELECT * FROM Participations";
                             $result = $conn->query($query);
                             if (!$result) 
                                 die ("Database access failed: " . $conn->error);
@@ -150,15 +151,18 @@
                             {
                                 $result->data_seek($j);
                                 $row = $result->fetch_array(MYSQLI_ASSOC);
+                                $paInfo = getInstitutionByType($conn, $row['ParticipantID'], "pa");
+                                $evInfo = getInstitutionByType($conn, $row['EventID'], "ev");
                                 ?>
                                 <tr>
                                     <td></td>
                                     <td><? echo $row['ParticipantID']; ?></td>
-                                    <td><? echo $row['FirstName'] . " " . $row['LastName'] ; ?></td>
-                                    <td><? echo getInstitution($conn, $row['InstitutionID']); ?></td>
-                                    <td><? echo $row['Role']; ?></td>
-                                    <td><? echo $row['Title']; ?></td>
-                                    <td><? echo $row['Email']; ?></td>
+                                    <td><? echo $paInfo['Institution']; ?></td>
+                                    <td><? echo $paInfo['FirstName'] . " " . $paInfo['LastName']; ?></td>
+                                    <td><? echo $row['EventID']; ?></td>
+                                    <td><? echo $evInfo['Name']; ?></td>
+                                    <td><? echo $evInfo['AcademicYear']; ?></td>
+                                    <td><? echo $evInfo['Host']; ?></td>
                                 </tr>
                                 <?php
                             }
@@ -169,21 +173,33 @@
                     <!-- /.table-responsive -->
 
                     <!-- The form which is used to populate the item data -->
-                    <form id="participantForm" method="post" class="form-horizontal" style="display: none;">
-                        <input type="hidden" name="id">
+                    <form id="participationForm" method="post" class="form-horizontal" style="display: none;">
+                        <input type="hidden" name="participantID">
+                        <input type="hidden" name="eventID">
                         <div class="form-group">
-                            <label class="col-xs-4 control-label">First Name:</label>
+                            <label class="col-xs-4 control-label">Event:</label>
                             <div class="col-xs-8">
-                                <input name="firstName" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-xs-4 control-label">Last Name:</label>
-                            <div class="col-xs-8">
-                                <input name="lastName" type="text" class="form-control">
-                            </div>
-                        </div>
+                                <select name="event-select" class="form-control">
+                                    <option>Select event</option>
+                                    <?php
+                                    $query  = "SELECT EventID, Name FROM Events";
+                                    $result = $conn->query($query);
+                                    if (!$result) 
+                                        die ("Database access failed: " . $conn->error);
 
+                                    $rows = $result->num_rows;
+                                    for ($j = 0 ; $j < $rows ; ++$j)
+                                    {
+                                        $result->data_seek($j);
+                                        $row = $result->fetch_array(MYSQLI_ASSOC);
+                                        ?>
+                                        <option value="<? echo $row['EventID']; ?>" ><? echo $row['Name']; ?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution:</label>
                             <div class="col-xs-8">
@@ -210,22 +226,17 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-xs-4 control-label">Role:</label>
+                        <div id="participants-select-group" class="form-group">
+                            <label class="col-xs-4 control-label">Participants:</label>
                             <div class="col-xs-8">
-                                <input name="role" type="text" class="form-control" placeholder="Optional">
+                                <select name="participants-select" multiple class="form-control">
+                                </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-xs-4 control-label">Title:</label>
+                        <div id="participant-group" class="form-group" style="display: none">
+                            <label class="col-xs-4 control-label">Participant:</label>
                             <div class="col-xs-8">
-                                <input name="title" type="text" class="form-control" placeholder="Optional">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-xs-4 control-label">Email:</label>
-                            <div class="col-xs-8">
-                                <input name="email" type="text" class="form-control" placeholder="Optional">
+                                <p name="participant" class="form-control-static"></p>
                             </div>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -277,19 +288,20 @@
     <script>
         $(document).ready(function() {
             checkAlert();
-            var table = $('#participantsTable').DataTable( {
+            var table = $('#participationsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
-                    "emptyTable": "There is no participant at this point"
+                    "emptyTable": "There is no participation at this point"
                 },
                 "autoWidth": false,
                 "columns": [ 
                     { "width": "5%" }, 
                     { "width": "0%" },
+                    { "width": "17%" }, 
                     { "width": "15%" }, 
-                    { "width": "15%" }, 
-                    { "width": "13%" }, 
-                    { "width": "27%" }, 
+                    { "width": "0%" },
+                    { "width": "25%" },
+                    { "width": "5%" },
                     { "width": "17%" }
                 ],
                 columnDefs: [ 
@@ -300,7 +312,7 @@
                     },
                     {   
                         visible: false,
-                        targets: 1
+                        targets: [1, 4]
                     } 
                 ],
                 select: {
@@ -317,14 +329,14 @@
                                 action: function ( e, dt, node, config ) {
                                     bootbox
                                         .dialog({
-                                            title: 'Add participant',
-                                            message: $('#participantForm'),
+                                            title: 'Add participation',
+                                            message: $('#participationForm'),
                                             buttons: {
                                                 add: {
                                                     label: 'Add',
                                                     className: 'btn btn-success',
                                                     callback: function() {
-                                                        if (!$('#participantForm').valid()) {
+                                                        if (!$('#participationForm').valid()) {
                                                             return false;
                                                         }
                                                         $('#form-update').val("add").end();
@@ -339,10 +351,10 @@
                                             show: false
                                         })
                                         .on('show.bs.modal', function() {
-                                            $('#participantForm').show();
+                                            $('#participationForm').show();
                                         })
                                         .on('hide.bs.modal', function(e) {
-                                            $('#participantForm').hide().appendTo('body');
+                                            $('#participationForm').hide().appendTo('body');
                                         })
                                         .modal('show');
                                 }
@@ -351,26 +363,29 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#participantForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#participantForm').find('[name="firstName"]').val(rowData[2].substr(0,rowData[2].indexOf(' '))).end();
-                                    $('#participantForm').find('[name="lastName"]').val(rowData[2].substr(rowData[2].indexOf(' ')+1)).end();
+                                    $('#participationForm').find('[name="participantID"]').val(rowData[1]).end();
                                     $('select[name=institution-select] option').filter(function() {
-                                        return $(this).text() == rowData[3]; 
+                                        return $(this).text() == rowData[2]; 
                                     }).prop('selected', true);
-                                    $('#participantForm').find('[name="role"]').val(rowData[4]).end();
-                                    $('#participantForm').find('[name="title"]').val(rowData[5]).end();
-                                    $('#participantForm').find('[name="email"]').val(rowData[6]).end();
+                                    $('select[name=institution-select]').prop('disabled', true);
+                                    $('#participants-select-group').hide();
+                                    $('#participant-group').show();
+                                    $('#participationForm').find('[name="participant"]').text(rowData[3]).end();
+                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
+                                    $('select[name=event-select] option').filter(function() {
+                                        return $(this).text() == rowData[5]; 
+                                    }).prop('selected', true);
 
                                     bootbox
                                         .dialog({
-                                            title: 'Edit participant',
-                                            message: $('#participantForm'),
+                                            title: 'Edit participation',
+                                            message: $('#participationForm'),
                                             buttons: {
                                                 update: {
                                                     label: 'Update',
                                                     className: 'btn btn-primary',
                                                     callback: function() {
-                                                        if (!$('#participantForm').valid()) {
+                                                        if (!$('#participationForm').valid()) {
                                                             return false;
                                                         }
                                                         $('#form-update').val("update").end();
@@ -385,10 +400,10 @@
                                             show: false
                                         })
                                         .on('show.bs.modal', function() {
-                                            $('#participantForm').show();
+                                            $('#participationForm').show();
                                         })
                                         .on('hide.bs.modal', function(e) {
-                                            $('#participantForm').hide().appendTo('body');
+                                            $('#participationForm').hide().appendTo('body');
                                         })
                                         .modal('show');
                                 },
@@ -398,9 +413,8 @@
                                 text: 'Delete',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#participantForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#participantForm').find('[name="firstName"]').val(rowData[2].substr(0,rowData[2].indexOf(' '))).end();
-                                    $('#participantForm').find('[name="lastName"]').val(rowData[2].substr(rowData[2].indexOf(' ')+1)).end();
+                                    $('#participationForm').find('[name="participantID"]').val(rowData[1]).end();
+                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
 
                                     bootbox
                                         .confirm( {
@@ -443,32 +457,13 @@
                 table.button( 2 ).disable();
             } );
 
-            $('#participantForm').validate({
+            $('#participationForm').validate({
                 rules: {
-                    firstName: {
-                        maxlength: 30,
-                        required: true,
-                        regex: /^[A-Za-z]{1,}$/
-                    },
-                    lastName: {
-                        maxlength: 30,
-                        required: true,
-                        regex: /^[A-Za-z]{1,}$/
+                    'event-select': {
+                        valueNotEquals: "Select event"
                     },
                     'institution-select': {
                         valueNotEquals: "Select institution"
-                    },
-                    role: {
-                        maxlength: 100,
-                        regex: /^[A-Za-z\s]{1,}$/
-                    },
-                    title: {
-                        maxlength: 100,
-                        regex: /^[A-Za-z\s]{1,}$/
-                    },
-                    email: {
-                        maxlength: 120,
-                        regex: /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/
                     }
                 },
                 highlight: function(element) {
@@ -485,6 +480,61 @@
                     } else {
                         error.insertAfter(element);
                     }
+                }
+            });
+
+            $('select[name=event-select]').change(function() {
+                var ev_selected = $('select[name=event-select]').val();
+                var ins_selected = $('select[name=institution-select]').val();
+                if (ev_selected !== "Select event") {
+                    var formdata = {
+                        file: "participations",
+                        eventID: ev_selected,
+                        institutionID: ins_selected
+                    };
+                    
+                    $.ajax( {
+                        type: 'POST',
+                        url: '../server_side/server_processing.php',
+                        data: formdata,
+                        dataType: 'JSON',
+                        success: function(data) {
+                            $('select[name=participants-select]').html('');
+                            var dataCount = data.length;
+                            if (dataCount > 4) {
+                                $('select[name=participants-select]').size('8');
+                            }
+                            $.each(data, function(){
+                                $('select[name=participants-select]').append('<option value="'+ this.ParticipantID +'">'+ this.FirstName + ' ' + this.LastName +'</option>')
+                            } );
+                        }
+                    } );
+                }
+            });
+
+            $('select[name=institution-select]').change(function() {
+                var pa_selects = $('select[name=participants-select] option').length;
+                var ins_selected = $('select[name=institution-select]').val();
+                var ev_selected = $('select[name=event-select]').val();
+                if ($('#participationForm').valid()) {
+                    var formdata = {
+                        file: "participations",
+                        eventID: ev_selected,
+                        institutionID: ins_selected
+                    };
+                    
+                    $.ajax( {
+                        type: 'POST',
+                        url: '../server_side/server_processing.php',
+                        data: formdata,
+                        dataType: 'JSON',
+                        success: function(data) {
+                            $('select[name=participants-select]').html('');
+                            $.each(data, function(){
+                                $('select[name=participants-select]').append('<option value="'+ this.ParticipantID +'">'+ this.FirstName + ' ' + this.LastName +'</option>')
+                            } );
+                        }
+                    } );
                 }
             });
         });
