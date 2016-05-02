@@ -333,7 +333,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#participantForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -379,7 +382,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#participantForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -460,11 +466,11 @@
                     },
                     role: {
                         maxlength: 100,
-                        regex: /^[A-Za-z\s]{1,}$/
+                        regex: /^[A-Za-z0-9\s]{1,}$/
                     },
                     title: {
                         maxlength: 100,
-                        regex: /^[A-Za-z\s]{1,}$/
+                        regex: /^[A-Za-z0-9\s]{1,}$/
                     },
                     email: {
                         maxlength: 120,

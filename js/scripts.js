@@ -55,7 +55,7 @@ function addForm(form) {
             var formData = {
                 table: 'Institutions',
                 institutionName: $('#institutionForm').find('[name="institutionName"]').val(),
-                isGLAA: $('input[name=optionsRadiosInline]:checked').val()
+                isGLCA: $('input[name=optionsRadiosInline]:checked').val()
             };
             msg = "Institution \"" + $('#institutionForm').find('[name="institutionName"]').val() + "\" has been added.";
             break;
@@ -109,6 +109,8 @@ function addForm(form) {
             else {
                 localStorage.setItem('form', 'false');
                 localStorage.setItem('msg', text);
+                window.location.reload();
+                $(window).scrollTop(scrollPosition); 
             }                   
         }
     } );
@@ -122,7 +124,8 @@ function updateForm(form) {
             var formData = {
                 table: 'Institutions',
                 institutionID: $('#institutionForm').find('[name="id"]').val(),
-                isGLAA: $('input[name=optionsRadiosInline]:checked').val()
+                institutionName: $('#institutionForm').find('[name="institutionName"]').val(),
+                isGLCA: $('input[name=optionsRadiosInline]:checked').val()
             };
             msg = "Record \"" + $('#institutionForm').find('[name="institutionName"]').val() + "\" has been update.";
             break;
@@ -176,6 +179,8 @@ function updateForm(form) {
             else {
                 localStorage.setItem('form', 'false');
                 localStorage.setItem('msg', text);
+                window.location.reload();
+                $(window).scrollTop(scrollPosition); 
             }                
         }
     } );
@@ -232,6 +237,8 @@ function deleteForm(form) {
             else {
                 localStorage.setItem('form', 'false');
                 localStorage.setItem('msg', text);
+                window.location.reload();
+                $(window).scrollTop(scrollPosition); 
             }                     
         }
     } );

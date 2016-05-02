@@ -345,7 +345,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#participationForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -394,7 +397,13 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#participationForm').closest('form')[0].reset();
+                                                        $('select[name=institution-select]').prop('disabled', false);
+                                                        $('#participant-group').hide();
+                                                        $('#participants-select-group').show();
+                                                    }
                                                 }
                                             },
                                             show: false

@@ -261,7 +261,7 @@
 
     <!-- Populate Academic Year Selector -->
     <script>
-        for (i = new Date().getFullYear(); i >= 2000; i--) {
+        for (i = new Date().getFullYear(); i >= 2015; i--) {
             $('select[name=year-select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
         }
     </script>
@@ -325,7 +325,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#eventForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -371,7 +374,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#eventForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -439,7 +445,7 @@
                     name: {
                         maxlength: 100,
                         required: true,
-                        regex: /^[A-Za-z\s]{1,}$/
+                        regex: /^[A-Za-z0-9\s]{1,}$/
                     },
                     description: {
                         maxlength: 255

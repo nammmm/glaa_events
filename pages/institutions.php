@@ -128,7 +128,7 @@
                                     <th></th>
                                     <th>ID</th>
                                     <th>Institution</th>
-                                    <th>GLAA Member</th>
+                                    <th>GLCA Member</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -152,7 +152,7 @@
                                     <td></td>
                                     <td><? echo $row['InstitutionID']; ?></td>
                                     <td><? echo $row['Institution']; ?></td>
-                                    <td><? echo $row['IsGLAA'] ? "Yes" : "No"; ?></td>
+                                    <td><? echo $row['IsGLCA'] ? "Yes" : "No"; ?></td>
                                 </tr>
                                 <?php
                             }
@@ -174,13 +174,13 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-xs-4 control-label">Is GLAA Member?</label>
+                            <label class="col-xs-4 control-label">Is GLCA Member?</label>
                             <div class="col-xs-8">
                                 <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosInline" id="isGLAATrue" value="yes">Yes
+                                    <input type="radio" name="optionsRadiosInline" id="isGLCATrue" value="yes">Yes
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosInline" id="isGLAAFalse" value="no">No
+                                    <input type="radio" name="optionsRadiosInline" id="isGLCAFalse" value="no">No
                                 </label>
                             </div>
                         </div>
@@ -279,7 +279,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#institutionForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -299,12 +302,11 @@
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
                                     $('#institutionForm').find('[name="institutionName"]').val(rowData[2]).end();
-                                    $('#institutionForm').find('[name="institutionName"]').prop('disabled', true);
                                     if (rowData[3] === "Yes") {
-                                        $("#isGLAATrue").prop("checked", true);
+                                        $("#isGLCATrue").prop("checked", true);
                                     }
                                     else {
-                                        $("#isGLAAFalse").prop("checked", true);
+                                        $("#isGLCAFalse").prop("checked", true);
                                     }
 
                                     bootbox
@@ -325,7 +327,10 @@
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
-                                                    className: 'btn btn-default'
+                                                    className: 'btn btn-default',
+                                                    callback: function() {
+                                                        $('#institutionForm').closest('form')[0].reset();
+                                                    }
                                                 }
                                             },
                                             show: false
@@ -393,7 +398,7 @@
                     institutionName: {
                         maxlength: 100,
                         required: true,
-                        regex: /^[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/
+                        regex: /^[A-Za-z0-9\s]{1,}[\.]{0,1}[A-Za-z0-9\s]{0,}$/
                     },
                     optionsRadiosInline: {
                         required: true

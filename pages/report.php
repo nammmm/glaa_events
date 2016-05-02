@@ -334,7 +334,7 @@
 
     <!-- Populate Academic Year Selector -->
     <script>
-        for (i = new Date().getFullYear(); i >= 2000; i--) {
+        for (i = new Date().getFullYear(); i >= 2015; i--) {
             $('select[name=year_select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
         }
     </script>
@@ -389,7 +389,7 @@
                         buttons: [
                             {
                                 extend: 'csvHtml5',
-                                text: 'Download as CSV',
+                                text: 'Convert to CSV',
                                 className: 'btn btn-success'
                             }
                         ]

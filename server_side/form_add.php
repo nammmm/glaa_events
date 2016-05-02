@@ -12,10 +12,10 @@ if (isset($_POST['table'])) {
 	switch ($table) {
 		case 'Institutions':
 			$institutionName = sanitizeMySQL($conn, $_POST['institutionName']);
-			$isGLAA = (sanitizeMySQL($conn, $_POST['isGLAA']) == "yes") ? 1 : 0;
+			$isGLCA = (sanitizeMySQL($conn, $_POST['isGLCA']) == "yes") ? 1 : 0;
 
-			$query = "INSERT INTO Institutions (Institution, IsGLAA)" .
-                    "VALUES('$institutionName', $isGLAA)";
+			$query = "INSERT INTO Institutions (Institution, IsGLCA)" .
+                    "VALUES('$institutionName', $isGLCA)";
 			break;
 		case 'Participants':
 			$firstName = sanitizeMySQL($conn, $_POST['firstName']);

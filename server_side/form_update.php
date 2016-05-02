@@ -11,10 +11,12 @@ if (isset($_POST['table'])) {
 	switch ($table) {
 		case 'Institutions':
 			$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
-			$isGLAA = (sanitizeMySQL($conn, $_POST['isGLAA']) == "yes") ? 1 : 0;
+			$institutionName = sanitizeMySQL($conn, $_POST['institutionName']);
+			$isGLCA = (sanitizeMySQL($conn, $_POST['isGLCA']) == "yes") ? 1 : 0;
 
 			$query = "UPDATE Institutions SET " .
-						"IsGLAA = $isGLAA " . 
+						"Institution = '$institutionName', " .
+						"IsGLCA = $isGLCA " . 
 						"WHERE InstitutionID = $institutionID";
 			break;
 		case 'Participants':
