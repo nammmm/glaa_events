@@ -11,6 +11,8 @@
 
     <title>GLAA Event Manager</title>
 
+    <link rel="shortcut icon" href="../dist/img/favicon.ico" type="image/x-icon">
+
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 

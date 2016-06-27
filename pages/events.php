@@ -11,6 +11,8 @@
 
     <title>GLAA Event Manager</title>
 
+    <link rel="shortcut icon" href="../dist/img/favicon.ico" type="image/x-icon">
+
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -18,12 +20,16 @@
     <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
     <!-- DataTables CSS -->
-    <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.1.2/css/select.bootstrap.min.css">
+    <link href="../bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables Buttons CSS -->
+    <link href="../bower_components/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables Select CSS -->
+    <link href="../bower_components/datatables.net-select-bs/css/select.bootstrap.min.css" rel="stylesheet">
 
     <!-- DataTables Responsive CSS -->
-    <link href="../bower_components/datatables-responsive/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
@@ -237,21 +243,25 @@
     <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
     <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     
-    <!-- DataTables Buttons -->
-    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
+    <!-- DataTables Buttons JavaScript -->
+    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
     
-    <!-- DataTables Selects -->
-    <script src="https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js"></script>
+    <!-- DataTables Selects JavaScript -->
+    <script src="../bower_components/datatables.net-select/js/dataTables.select.min.js"></script>
+
+    <!-- DataTables Responsive JavaScript -->
+    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
 
     <!-- Bootbox JavaScript -->
-    <script src="../js/bootboxjs/bootbox.min.js"></script>
+    <script src="../bower_components/bootbox.js/bootbox.js"></script>
 
     <!-- jQuery Validation JavaScript -->
-    <script src="../js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
