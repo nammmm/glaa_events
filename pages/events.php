@@ -31,6 +31,9 @@
     <!-- DataTables Responsive CSS -->
     <link href="../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
 
+    <!-- Selectize CSS -->
+    <link href="../bower_components/selectize/dist/css/selectize.bootstrap3.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
 
@@ -43,6 +46,39 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- jQuery -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons JavaScript -->
+    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    
+    <!-- DataTables Selects JavaScript -->
+    <script src="../bower_components/datatables.net-select/js/dataTables.select.min.js"></script>
+
+    <!-- DataTables Responsive JavaScript -->
+    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+
+    <!-- Selectize JavaScript -->
+    <script src="../bower_components/selectize/dist/js/standalone/selectize.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../bower_components/bootbox.js/bootbox.js"></script>
+
+    <!-- jQuery Validation JavaScript -->
+    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
 
 </head>
 
@@ -190,14 +226,27 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Academic Year:</label>
                             <div class="col-xs-8">
-                                <select name="year-select" class="form-control">
+                                <select id="select-year" name="select-year" class="form-control">
                                 </select>
                             </div>
+                            <script>
+                                // fill year options
+                                for (i = new Date().getFullYear(); i >= 2015; i--) {
+                                    $('select[name=select-year]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+                                }
+                                // selectize
+                                $('#select-year').selectize({
+                                    sortField: {
+                                        field: 'text',
+                                        direction: 'desc'
+                                    }
+                                });
+                            </script>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Host Institution:</label>
                             <div class="col-xs-8">
-                                <select name="institution-select" class="form-control">
+                                <select id="select-institution" name="select-institution" class="form-control" placeholder="Select institution" required>
                                     <option>Select institution</option>
                                     <?php
                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
@@ -219,6 +268,14 @@
                                     ?>
                                 </select>
                             </div>
+                            <script>
+                                $('#select-institution').selectize({
+                                    sortField: {
+                                        field: 'text',
+                                        direction: 'asc'
+                                    }
+                                });
+                            </script>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
                     </form>
@@ -233,48 +290,11 @@
     </div>
     <!-- /#wrapper -->
 
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    
-    <!-- DataTables Buttons JavaScript -->
-    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-    
-    <!-- DataTables Selects JavaScript -->
-    <script src="../bower_components/datatables.net-select/js/dataTables.select.min.js"></script>
-
-    <!-- DataTables Responsive JavaScript -->
-    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-
-    <!-- Bootbox JavaScript -->
-    <script src="../bower_components/bootbox.js/bootbox.js"></script>
-
-    <!-- jQuery Validation JavaScript -->
-    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
-
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
-
-    <!-- Populate Academic Year Selector -->
-    <script>
-        for (i = new Date().getFullYear(); i >= 2015; i--) {
-            $('select[name=year-select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
-        }
-    </script>
 
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
@@ -329,8 +349,9 @@
                                                         if (!$('#eventForm').valid()) {
                                                             return false;
                                                         }
-                                                        $('#form-update').val("add").end();
-                                                        $('button#form-update').click();
+                                                        console.log($('#select-institution').find(":selected").text());
+                                                        // $('#form-update').val("add").end();
+                                                        // $('button#form-update').click();
                                                     }
                                                 },
                                                 cancel: {
@@ -359,10 +380,10 @@
                                     $('#eventForm').find('[name="id"]').val(rowData[1]).end();
                                     $('#eventForm').find('[name="name"]').val(rowData[2]).end();
                                     $('#eventForm').find('[name="description"]').val(rowData[3]).end();
-                                    $('select[name=year-select] option').filter(function() {
+                                    $('select[name=select-year] option').filter(function() {
                                         return $(this).text() == rowData[4]; 
                                     }).prop('selected', true);
-                                    $('select[name=institution-select] option').filter(function() {
+                                    $('select[name=select-institution] option').filter(function() {
                                         return $(this).text() == rowData[5]; 
                                     }).prop('selected', true);
 
@@ -451,6 +472,7 @@
             } );
 
             $('#eventForm').validate({
+                ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 rules: {
                     name: {
                         maxlength: 100,
@@ -459,9 +481,6 @@
                     },
                     description: {
                         maxlength: 255
-                    },
-                    'institution-select': {
-                        valueNotEquals: "Select institution"
                     }
                 },
                 highlight: function(element) {

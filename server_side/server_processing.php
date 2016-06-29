@@ -1,30 +1,17 @@
 <?php
 require_once 'helper.php';
 if (isset($_POST['file'])) {
-	if (isset($_POST['eventID']) && isset($_POST['institutionID'])) { 
-		require_once 'login.php';
-		$conn = new mysqli($hn, $un, $pw, $db);
-		if ($conn->connect_error) die($conn->connect_error);
+	require_once 'login.php';
+	$conn = new mysqli($hn, $un, $pw, $db);
+	if ($conn->connect_error) die($conn->connect_error);
 
-		$eventID = sanitizeMySQL($conn, $_POST['eventID']);
-		$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
+	if (isset($_POST['participantID'])) { 
+		$participantID = sanitizeMySQL($conn, $_POST['participantID']);
 
-		if ($institutionID == "Select institution") {
-			$query = "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Participants pa LEFT JOIN Participations pp ON pp.ParticipantID = pa.ParticipantID WHERE pp.ParticipantID IS NULL) UNION " . "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Events ev " . 
-						"LEFT JOIN Participations pp " . 
-						"ON ev.EventID = pp.EventID " . 
-						"LEFT JOIN Participants pa " . 
-						"ON pp.ParticipantID = pa.ParticipantID " . 
-						"WHERE pp.EventID <> $eventID)";
-		}
-		else {
-			$query = "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Participants pa LEFT JOIN Participations pp ON pp.ParticipantID = pa.ParticipantID WHERE pp.ParticipantID IS NULL AND pa.InstitutionID = $institutionID) UNION " . "(SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Events ev " . 
-						"LEFT JOIN Participations pp " . 
-						"ON ev.EventID = pp.EventID " . 
-						"LEFT JOIN Participants pa " . 
-						"ON pp.ParticipantID = pa.ParticipantID " . 
-						"WHERE pp.EventID <> $eventID AND pa.InstitutionID = $institutionID)";
-		}
+		$query = "SELECT ev.EventID, ev.Name FROM Events ev " .
+				"WHERE ev.EventID NOT IN " .
+				"(SELECT pp.EventID FROM Participations pp " .
+				"WHERE pp.ParticipantID = $participantID)";
 
 		$return = array();
 		if ($result = $conn->query($query)) {
@@ -32,13 +19,28 @@ if (isset($_POST['file'])) {
 		    while ($row=mysqli_fetch_assoc($result)) {
 		        $return[] = $row;
 		    }
-
-		    $result->close();
-		    $conn->close();
-
 		    echo(json_encode($return));
 		}
 	}
+	elseif (isset($_POST['eventID'])) {
+		$eventID = sanitizeMySQL($conn, $_POST['eventID']);
+
+		$query = "SELECT pa.ParticipantID, pa.FirstName, pa.LastName FROM Participants pa " .
+				"WHERE pa.ParticipantID NOT IN " .
+				"(SELECT pp.ParticipantID FROM Participations pp " .
+				"WHERE pp.EventID = $eventID)";
+
+		$return = array();
+		if ($result = $conn->query($query)) {
+		    // fetch array
+		    while ($row=mysqli_fetch_assoc($result)) {
+		        $return[] = $row;
+		    }
+		    echo(json_encode($return));
+		}
+	}
+	$result->close();
+	$conn->close();
 }
 
 function getInstitution($connection, $id)
@@ -89,10 +91,10 @@ function getInstitutionByType($connection, $id, $type)
 function updateReport() {
 	$query = "";
 
-	$institutionID = $_POST['institution_select'];
-	$eventID = $_POST['event_select'];
-	$academicYear = $_POST['year_select'];
-	$hostID = $_POST['host_select'];
+	$institutionID = $_POST['select-institution'];
+	$eventID = $_POST['select-event'];
+	$academicYear = $_POST['select-year'];
+	$hostID = $_POST['select-host'];
 
 	if ($institutionID == "All" && $eventID == "All" && $academicYear == "All" && $hostID == "All") {
 		$query = "SELECT * FROM Participations";

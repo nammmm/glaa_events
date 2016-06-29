@@ -28,6 +28,9 @@
     <!-- DataTables Responsive CSS -->
     <link href="../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
 
+    <!-- Selectize CSS -->
+    <link href="../bower_components/selectize/dist/css/selectize.bootstrap3.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
 
@@ -40,6 +43,37 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- jQuery -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons JavaScript -->
+    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="../bower_components/datatables.net-buttons/js/buttons.html5.min.js"></script>
+
+    <!-- DataTables Responsive JavaScript -->
+    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+
+    <!-- Selectize JavaScript -->
+    <script src="../bower_components/selectize/dist/js/standalone/selectize.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../bower_components/bootbox.js/bootbox.js"></script>
+
+    <!-- jQuery Validation JavaScript -->
+    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
 
 </head>
 
@@ -138,8 +172,8 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose institution:</label>
                                             <div class="col-xs-8">
-                                                <select name="institution_select" class="form-control">
-                                                    <option>All</option>
+                                                <select id="select-institution" name="select-institution" class="form-control">
+                                                    <option value="-1">All</option>
                                                     <?php
                                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
                                                     $result = $conn->query($query);
@@ -158,16 +192,37 @@
                                                     ?>
                                                 </select>
                                             </div>
+                                            <script>
+                                                $('#select-institution').selectize({
+                                                    sortField: {
+                                                        field: 'text',
+                                                        direction: 'asc'
+                                                    }
+                                                });
+                                            </script>
                                         </div>
 
                                         <!-- Choose Year -->
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose year:</label>
                                             <div class="col-xs-8">
-                                                <select name="year_select" class="form-control">
-                                                    <option>All</option>
+                                                <select id="select-year" name="select-year" class="form-control">
+                                                    <option value="-1">All</option>
                                                 </select>
                                             </div>
+                                            <script>
+                                                // fill year options
+                                                for (i = new Date().getFullYear(); i >= 2015; i--) {
+                                                    $('select[name=select-year]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+                                                }
+                                                // selectize
+                                                $('#select-year').selectize({
+                                                    sortField: {
+                                                        field: 'text',
+                                                        direction: 'desc'
+                                                    }
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <!-- /.col-lg-6 (nested) -->
@@ -177,8 +232,8 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose event:</label>
                                             <div class="col-xs-8">
-                                                <select name="event_select" class="form-control">
-                                                    <option>All</option>
+                                                <select id="select-event" name="select-event" class="form-control">
+                                                    <option value="-1">All</option>
                                                     <?php
                                                     $query  = "SELECT EventID, Name FROM Events";
                                                     $result = $conn->query($query);
@@ -197,14 +252,22 @@
                                                     ?>
                                                 </select>
                                             </div>
+                                            <script>
+                                                $('#select-event').selectize({
+                                                    sortField: {
+                                                        field: 'text',
+                                                        direction: 'asc'
+                                                    }
+                                                });
+                                            </script>
                                         </div>
 
                                         <!-- Choose host -->
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose host:</label>
                                             <div class="col-xs-8">
-                                                <select name="host_select" class="form-control">
-                                                    <option>All</option>
+                                                <select id="select-host" name="select-host" class="form-control">
+                                                    <option value="-1">All</option>
                                                     <?php
                                                     $query  = "SELECT ins.InstitutionID, ins.Institution FROM Institutions ins LEFT JOIN Events ev ON ev.HostID = ins.InstitutionID WHERE ev.HostID IS NOT NULL";
                                                     $result = $conn->query($query);
@@ -223,6 +286,14 @@
                                                     ?>
                                                 </select>
                                             </div>
+                                            <script>
+                                                $('#select-host').selectize({
+                                                    sortField: {
+                                                        field: 'text',
+                                                        direction: 'asc'
+                                                    }
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                     <!-- /.col-lg-6 (nested) -->
@@ -262,7 +333,7 @@
                             <tbody>
                             <?php
                             $query = "SELECT * FROM Participations";
-                            if (isset($_POST['institution_select']) || isset($_POST['event_select']) || isset($_POST['year_select']) || isset($_POST['host_select'])) {
+                            if (isset($_POST['select-institution']) || isset($_POST['select-event']) || isset($_POST['select-year']) || isset($_POST['select-host'])) {
                                 $query = updateReport();
                             }
                             $result = $conn->query($query);
@@ -306,58 +377,27 @@
     </div>
     <!-- /#wrapper -->
 
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    
-    <!-- DataTables Buttons JavaScript -->
-    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-    <script src="../bower_components/datatables.net-buttons/js/buttons.html5.min.js"></script>
-
-    <!-- Bootbox JavaScript -->
-    <script src="../bower_components/bootbox.js/bootbox.js"></script>
-
-    <!-- jQuery Validation JavaScript -->
-    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
-
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Populate Academic Year Selector -->
-    <script>
-        for (i = new Date().getFullYear(); i >= 2015; i--) {
-            $('select[name=year_select]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
-        }
-    </script>
-
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
         $(document).ready(function() {            
             loadReportFilters();
             $('#form-reset').click(function() {
-                $('select[name=institution_select] option').filter(function() {
+                $('select[name=select-institution] option').filter(function() {
                     return $(this).text() == "All"; 
                 }).prop('selected', true);
-                $('select[name=event_select] option').filter(function() {
+                $('select[name=select-event] option').filter(function() {
                     return $(this).text() == "All"; 
                 }).prop('selected', true);
-                $('select[name=year_select] option').filter(function() {
+                $('select[name=select-year] option').filter(function() {
                     return $(this).text() == "All"; 
                 }).prop('selected', true);
-                $('select[name=host_select] option').filter(function() {
+                $('select[name=select-host] option').filter(function() {
                     return $(this).text() == "All"; 
                 }).prop('selected', true);
             });
@@ -366,24 +406,18 @@
                 "language": {
                     "emptyTable": "No record available"
                 },
-                columnDefs: [
-                    {   
-                        visible: false,
-                        targets: [3, 4, 5, 7]
-                    } 
-                ],
                 "autoWidth": false,
-                "columns": [
-                    { "width": "17%" }, 
-                    { "width": "12%" },
-                    { "width": "12%" },
-                    { "width": "0%" },
-                    { "width": "0%" },
-                    { "width": "0%" },
-                    { "width": "25%" },
-                    { "width": "0%" },
+                "columns": [ 
+                    { "width": "10%" },
                     { "width": "5%" },
-                    { "width": "17%" }
+                    { "width": "5%" },
+                    { "width": "5%" },
+                    { "width": "15%" },
+                    { "width": "10%" },
+                    { "width": "10%" },
+                    { "width": "25%" },
+                    { "width": "5%" },
+                    { "width": "10%" }
                 ],
                 order: [[ 1, 'asc' ]],
                 responsive: true,

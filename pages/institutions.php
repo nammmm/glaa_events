@@ -31,6 +31,9 @@
     <!-- DataTables Responsive CSS -->
     <link href="../bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
 
+    <!-- Selectize CSS -->
+    <link href="../bower_components/selectize/dist/css/selectize.bootstrap3.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="../dist/css/dashboard.css" rel="stylesheet">
 
@@ -43,6 +46,39 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- jQuery -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    
+    <!-- DataTables Buttons JavaScript -->
+    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    
+    <!-- DataTables Selects JavaScript -->
+    <script src="../bower_components/datatables.net-select/js/dataTables.select.min.js"></script>
+
+    <!-- DataTables Responsive JavaScript -->
+    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+
+    <!-- Selectize JavaScript -->
+    <script src="../bower_components/selectize/dist/js/standalone/selectize.min.js"></script>
+
+    <!-- Bootbox JavaScript -->
+    <script src="../bower_components/bootbox.js/bootbox.js"></script>
+
+    <!-- jQuery Validation JavaScript -->
+    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
 
 </head>
 
@@ -203,36 +239,6 @@
     </div>
     <!-- /#wrapper -->
 
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    
-    <!-- DataTables Buttons JavaScript -->
-    <script src="../bower_components/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../bower_components/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-    
-    <!-- DataTables Selects JavaScript -->
-    <script src="../bower_components/datatables.net-select/js/dataTables.select.min.js"></script>
-
-    <!-- DataTables Responsive JavaScript -->
-    <script src="../bower_components/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../bower_components/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-
-    <!-- Bootbox JavaScript -->
-    <script src="../bower_components/bootbox.js/bootbox.js"></script>
-
-    <!-- jQuery Validation JavaScript -->
-    <script src="../bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
-
     <!-- Custom JavaScript -->
     <script src="../js/scripts.js"></script>
 
@@ -248,6 +254,13 @@
                 "language": {
                     "emptyTable": "There is no institution at this point"
                 },
+                "autoWidth": false,
+                "columns": [ 
+                    { "width": "10%" },
+                    { "width": "10%" },
+                    { "width": "40%" },
+                    { "width": "40%" }
+                ],
                 columnDefs: [ 
                     {
                         orderable: false,
