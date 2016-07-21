@@ -34,11 +34,13 @@ if (isset($_POST['file'])) {
 		if ($result = $conn->query($query)) {
 		    // fetch array
 		    while ($row=mysqli_fetch_assoc($result)) {
+		    	$row['Institution'] = getInstitutionByType($conn, $row['ParticipantID'], 'pa')['Institution'];
 		        $return[] = $row;
 		    }
 		    echo(json_encode($return));
 		}
 	}
+
 	$result->close();
 	$conn->close();
 }

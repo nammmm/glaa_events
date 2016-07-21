@@ -473,6 +473,9 @@
                 table.button( 2 ).disable();
             } );
 
+            /** 
+            * Form validation code
+            */
             $('#participantForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 rules: {

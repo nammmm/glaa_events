@@ -234,20 +234,23 @@
                                 {
                                     $result->data_seek($j);
                                     $row = $result->fetch_array(MYSQLI_ASSOC);
+                                    $institution = getInstitutionByType($conn, $row['ParticipantID'], 'pa')['Institution'];
                                     ?>
-                                    <option value="<? echo $row['ParticipantID']; ?>" ><? echo $row['FirstName'] . " " . $row['LastName']; ?></option>
+                                    <option value="<? echo $row['ParticipantID']; ?>" ><? echo $row['FirstName'] . " " . $row['LastName'] . " &lt" . $institution . "&gt"; ?></option>
                                     <?php
                                 }
                                 ?>
                             </select>
                         </div>
                         <script>
-                            $('#select-participant').selectize({
+                            // Selectize participant select
+                            var $selectizeParticipant = $('#select-participant').selectize({
                                 sortField: {
                                     field: 'text',
                                     direction: 'asc'
                                 }
                             });
+                            var controlSelectPa = $selectizeParticipant[0].selectize;
                         </script>
                         <!-- /.Select participant -->
 
@@ -259,26 +262,27 @@
                             </select>
                         </div>
                         <script>
-                            $('#select-events').selectize({
+                            // Selectize events select
+                            var $selectizeEvents = $('#select-events').selectize({
                                 sortField: {
                                     field: 'text',
                                     direction: 'asc'
                                 }
                             });
-                            // get events that the selected participant can attend
+                            var controlSelectEvs = $selectizeEvents[0].selectize;
+
                             $('#select-participant').change(function() {
                                 var pa_selected = $('#select-participant').val();
                                 
                                 if (pa_selected) {
-                                    var formdata = {
-                                        file: "participations",
-                                        participantID: pa_selected
-                                    };
-                                    
+                                    // Show events that the selected participant can attend
                                     $.ajax( {
                                         type: 'POST',
                                         url: '../server_side/server_processing.php',
-                                        data: formdata,
+                                        data: {
+                                            file: "participations",
+                                            participantID: pa_selected
+                                        },
                                         dataType: 'JSON',
                                         success: function(data) {
                                             var selector = $('#select-events').selectize()[0].selectize;
@@ -327,12 +331,13 @@
                             </select>
                         </div>
                         <script>
-                            $('#select-event').selectize({
+                            var $selectizeEvent = $('#select-event').selectize({
                                 sortField: {
                                     field: 'text',
                                     direction: 'asc'
                                 }
                             });
+                            var controlSelectEv = $selectizeEvent[0].selectize;
                         </script>
                         <!-- /.Select participant -->
 
@@ -344,13 +349,15 @@
                             </select>
                         </div>
                         <script>
-                            $('#select-participants').selectize({
+                            var $selectizeParticipants = $('#select-participants').selectize({
                                 sortField: {
                                     field: 'text',
                                     direction: 'asc'
                                 }
                             });
-                            // get participants that the selected event can have
+                            var controlSelectPas = $selectizeParticipants[0].selectize;
+
+                            // Show participants that the selected event can have
                             $('#select-event').change(function() {
                                 var ev_selected = $('#select-event').val();
                                 
@@ -371,7 +378,7 @@
                                             $.each(data, function(){
                                                 selector.addOption([{
                                                     value: this.ParticipantID,
-                                                    text: this.FirstName + " " + this.LastName
+                                                    text: this.FirstName + " " + this.LastName + " &lt" + this.Institution + "&gt"
                                                 }]);
                                             } );
                                         }
@@ -461,7 +468,8 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
-                                                        $('#participationByPaForm').closest('form')[0].reset();
+                                                        controlSelectPa.clear();
+                                                        controlSelectEvs.clear();
                                                     }
                                                 }
                                             },
@@ -499,7 +507,8 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
-                                                        $('#participationByEvForm').closest('form')[0].reset();
+                                                        controlSelectEv.clear();
+                                                        controlSelectPas.clear();
                                                     }
                                                 }
                                             },
@@ -518,18 +527,18 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#participationByPaForm').find('[name="participantID"]').val(rowData[1]).end();
-                                    $('select[name=select-institution] option').filter(function() {
+                                    alert(rowData);
+                                    $('select[name=select-participant] option').filter(function() {
                                         return $(this).text() == rowData[2]; 
                                     }).prop('selected', true);
-                                    $('select[name=select-institution]').prop('disabled', true);
-                                    $('#select-participants-group').hide();
-                                    $('#participant-group').show();
-                                    $('#participationForm').find('[name="participant"]').text(rowData[3]).end();
-                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
-                                    $('select[name=select-event] option').filter(function() {
-                                        return $(this).text() == rowData[5]; 
-                                    }).prop('selected', true);
+                                    // $('select[name=select-institution]').prop('disabled', true);
+                                    // $('#select-participants-group').hide();
+                                    // $('#participant-group').show();
+                                    // $('#participationForm').find('[name="participant"]').text(rowData[3]).end();
+                                    // $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
+                                    // $('select[name=select-event] option').filter(function() {
+                                    //     return $(this).text() == rowData[5]; 
+                                    // }).prop('selected', true);
 
                                     bootbox
                                         .dialog({
@@ -540,7 +549,7 @@
                                                     label: 'Update',
                                                     className: 'btn btn-primary',
                                                     callback: function() {
-                                                        if (!$('#participationForm').valid()) {
+                                                        if (!$('#participationByPaForm').valid()) {
                                                             return false;
                                                         }
                                                         $('#form-update').val("update").end();
@@ -551,7 +560,7 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
-                                                        $('#participationForm').closest('form')[0].reset();
+                                                        $('#participationByPaForm').closest('form')[0].reset();
                                                         $('select[name=select-institution]').prop('disabled', false);
                                                         $('#participant-group').hide();
                                                         $('#select-participants-group').show();
@@ -561,10 +570,10 @@
                                             show: false
                                         })
                                         .on('show.bs.modal', function() {
-                                            $('#participationForm').show();
+                                            $('#participationByPaForm').show();
                                         })
                                         .on('hide.bs.modal', function(e) {
-                                            $('#participationForm').hide().appendTo('body');
+                                            $('#participationByPaForm').hide().appendTo('body');
                                         })
                                         .modal('show');
                                 },
@@ -618,6 +627,9 @@
                 table.button( 2 ).disable();
             } );
 
+            /** 
+            * Form validation code
+            */
             $('#participationByPaForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 highlight: function(element) {

@@ -2,5 +2,5 @@
 $hn = 'localhost';
 $db = 'glaa_events';
 $un = 'root';
-$pw = NULL;
+$pw = 'root';
 ?>

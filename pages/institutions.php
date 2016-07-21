@@ -416,6 +416,9 @@
                 table.button( 2 ).disable();
             } );
 
+            /** 
+            * Form validation code
+            */
             $('#institutionForm').validate({
                 rules: {
                     institutionName: {
