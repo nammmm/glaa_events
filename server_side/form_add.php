@@ -37,7 +37,16 @@ if (isset($_POST['table'])) {
 			$query = "INSERT INTO Events (Name, Description, AcademicYear, HostID)" .
                     "VALUES('$name', '$description', '$academicYear', $hostID)";
 			break;
-		case 'Participations':
+		case 'ParticipationsPa':
+			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
+			$eventIDs = json_decode($_POST['eventIDs']);
+
+			$query = "INSERT INTO Participations (ParticipantID, EventID) VALUES ";
+			foreach ($eventIDs as $eventID)
+				$query .= "(" . $participantID . ", " . $eventID . "), "; 
+			$query = rtrim($query, ", ");
+			break;
+		case 'ParticipationsEv':
 			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
 			$participantIDs = json_decode($_POST['participantIDs']);
 

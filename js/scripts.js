@@ -20,10 +20,16 @@ $("#eventForm").submit(function(e) {
     doAction('#eventForm');
 } );
 
-$("#participationForm").submit(function(e) {
+$("#participationByPaForm").submit(function(e) {
     // cancels the form submission
     e.preventDefault();
-    doAction('#participationForm');
+    doAction('#participationByPaForm');
+} );
+
+$("#participationByEvForm").submit(function(e) {
+    // cancels the form submission
+    e.preventDefault();
+    doAction('#participationByEvForm');
 } );
 
 $("#reportForm").submit(function(e) {
@@ -32,19 +38,14 @@ $("#reportForm").submit(function(e) {
 
 // Check operation type
 function doAction(form) {
-    var clickType = $('#form-update').val();
-    if (clickType === "add") {
-        addForm(form);
-    }
-    else if (clickType === "update") {
-        updateForm(form);
-    }
-    else if (clickType === "delete") {
-        deleteForm(form);
-    }
-    else if (clickType === "csv") {
+    var clickType;
+    if (form == "#participationByPaForm")       clickType = $('#form-update-by-pa').val();
+    else if (form == "#participationByEvForm")  clickType = $('#form-update-by-ev').val();
+    else                                        clickType = $('#form-update').val();
 
-    }
+    if (clickType === "add")                addForm(form);
+    else if (clickType === "update")        updateForm(form);
+    else if (clickType === "delete")        deleteForm(form);
 }
 
 // Add data to database
@@ -64,7 +65,7 @@ function addForm(form) {
                 table: 'Participants',
                 firstName: $('#participantForm').find('[name="firstName"]').val(),
                 lastName: $('#participantForm').find('[name="lastName"]').val(),
-                institutionID: $('select[name=select-institution]').val(),
+                institutionID: $('#select-institution').val(),
                 role: $('#participantForm').find('[name="role"]').val(),
                 title: $('#participantForm').find('[name="title"]').val(),
                 email: $('#participantForm').find('[name="email"]').val()
@@ -76,17 +77,32 @@ function addForm(form) {
                 table: 'Events',
                 name: $('#eventForm').find('[name="name"]').val(),
                 description: $('#eventForm').find('[name="description"]').val(),
-                academicYear: $('select[name=select-year]').val(),
-                hostID: $('select[name=select-institution]').val()
+                academicYear: $('#select-year').val(),
+                hostID: $('#select-institution').val()
             };
             msg = "Event \"" + $('#eventForm').find('[name="name"]').val() + "\" has been added.";
             break;
-        case '#participationForm':
-            var options = $('select[name=select-participants]').val() || [];
-            var JSONString = JSON.stringify(options);
+        case '#participationByPaForm':
+            var eventsSelected = $('#select-events').val() || [];
+            if (eventsSelected.length > 1)
+                msg = "Records have been added.";
+
+            var JSONString = JSON.stringify(eventsSelected);
             var formData = {
-                table: 'Participations',
-                eventID: $('select[name=select-event]').val(),
+                table: 'ParticipationsPa',
+                participantID: $('#select-participant').val(),
+                eventIDs: JSONString
+            };
+            break;
+        case '#participationByEvForm':
+            var participantsSelected = $('#select-participants').val() || [];
+            if (participantsSelected.length > 1)
+                msg = "Records have been added.";
+
+            var JSONString = JSON.stringify(participantsSelected);
+            var formData = {
+                table: 'ParticipationsEv',
+                eventID: $('#select-event').val(),
                 participantIDs: JSONString
             };
             break;
@@ -95,6 +111,7 @@ function addForm(form) {
     }
 
     var scrollPosition = $(window).scrollTop();
+    // console.log(formData);
     $.ajax( {
         type: "POST",
         url: "../server_side/form_add.php",

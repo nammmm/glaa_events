@@ -298,7 +298,7 @@
                                 }
                             });
                         </script>
-                        <button type="submit" id="form-update" class="hidden"></button>
+                        <button type="submit" id="form-update-by-pa" class="hidden"></button>
                     </form>
                     <!-- /hidden form -->
 
@@ -378,7 +378,7 @@
                                             $.each(data, function(){
                                                 selector.addOption([{
                                                     value: this.ParticipantID,
-                                                    text: this.FirstName + " " + this.LastName + " &lt" + this.Institution + "&gt"
+                                                    text: this.FirstName + " " + this.LastName + " <" + this.Institution + ">"
                                                 }]);
                                             } );
                                         }
@@ -386,7 +386,7 @@
                                 }
                             });
                         </script>
-                        <button type="submit" id="form-update" class="hidden"></button>
+                        <button type="submit" id="form-update-by-ev" class="hidden"></button>
                     </form>
                     <!-- /hidden form -->
                 </div>
@@ -460,14 +460,17 @@
                                                         if (!$('#participationByPaForm').valid()) {
                                                             return false;
                                                         }
-                                                        $('#form-update').val("add").end();
-                                                        $('button#form-update').click();
+                                                        // var temp = $('#select-events').val();
+                                                        // alert(temp);
+                                                        $('#form-update-by-pa').val("add").end();
+                                                        $('button#form-update-by-pa').click();
                                                     }
                                                 },
                                                 cancel: {
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
+                                                        // clear selectize options
                                                         controlSelectPa.clear();
                                                         controlSelectEvs.clear();
                                                     }
@@ -499,8 +502,8 @@
                                                         if (!$('#participationByEvForm').valid()) {
                                                             return false;
                                                         }
-                                                        $('#form-update').val("add").end();
-                                                        $('button#form-update').click();
+                                                        $('#form-update-by-ev').val("add").end();
+                                                        $('button#form-update-by-ev').click();
                                                     }
                                                 },
                                                 cancel: {
@@ -552,8 +555,8 @@
                                                         if (!$('#participationByPaForm').valid()) {
                                                             return false;
                                                         }
-                                                        $('#form-update').val("update").end();
-                                                        $('button#form-update').click();
+                                                        $('#form-update-by-pa').val("update").end();
+                                                        $('button#form-update-by-pa').click();
                                                     }
                                                 },
                                                 cancel: {
@@ -603,8 +606,8 @@
                                             },
                                             callback: function(result) {
                                                 if (result) {
-                                                    $('#form-update').val("delete").end();
-                                                    $('button#form-update').click();
+                                                    $('#form-update-by-pa').val("delete").end();
+                                                    $('button#form-update-by-pa').click();
                                                 }
                                             }
                                         } );

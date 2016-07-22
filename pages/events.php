@@ -232,7 +232,7 @@
                             <script>
                                 // fill year options
                                 for (i = new Date().getFullYear(); i >= 2015; i--) {
-                                    $('select[name=select-year]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+                                    $('#select-year').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
                                 }
                                 // selectize
                                 $('#select-year').selectize({
@@ -349,9 +349,9 @@
                                                         if (!$('#eventForm').valid()) {
                                                             return false;
                                                         }
-                                                        console.log($('#select-institution').find(":selected").text());
-                                                        // $('#form-update').val("add").end();
-                                                        // $('button#form-update').click();
+                                                        // console.log($('#select-institution').find(":selected").text());
+                                                        $('#form-update').val("add").end();
+                                                        $('button#form-update').click();
                                                     }
                                                 },
                                                 cancel: {
