@@ -167,8 +167,10 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>ID</th>
-                                    <th>Name</th>
+                                    <th>Participant ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Institution ID</th>
                                     <th>Institution</th>
                                     <th>Role</th>
                                     <th>Title</th>
@@ -196,7 +198,9 @@
                                 <tr>
                                     <td></td>
                                     <td><? echo $row['ParticipantID']; ?></td>
-                                    <td><? echo $row['FirstName'] . " " . $row['LastName'] ; ?></td>
+                                    <td><? echo $row['FirstName']; ?></td>
+                                    <td><? echo $row['LastName']; ?></td>
+                                    <td><? echo $row['InstitutionID']; ?></td>
                                     <td><? echo getInstitution($conn, $row['InstitutionID']); ?></td>
                                     <td><? echo $row['Role']; ?></td>
                                     <td><? echo $row['Title']; ?></td>
@@ -212,24 +216,24 @@
 
                     <!-- The form which is used to populate the item data -->
                     <form id="participantForm" method="post" class="form-horizontal" style="display: none;">
-                        <input type="hidden" name="id">
+                        <input type="hidden" id="participant-id">
                         <div class="form-group">
                             <label class="col-xs-4 control-label">First Name:</label>
                             <div class="col-xs-8">
-                                <input name="firstName" type="text" class="form-control">
+                                <input id="first-name" name="firstName" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Last Name:</label>
                             <div class="col-xs-8">
-                                <input name="lastName" type="text" class="form-control">
+                                <input id="last-name" name="lastName" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution:</label>
                             <div class="col-xs-8">
-                                <select id="select-institution" name="select-institution" class="form-control" placeholder="Select institution" required>
+                                <select id="select-institution" class="form-control" placeholder="Select institution" required>
                                     <option>Select institution</option>
                                     <?php
                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
@@ -252,30 +256,31 @@
                                 </select>
                             </div>
                             <script>
-                                $('#select-institution').selectize({
+                                var $selectizeInstitution = $('#select-institution').selectize({
                                     sortField: {
                                         field: 'text',
                                         direction: 'asc'
                                     }
                                 });
+                                var controlSelectIns = $selectizeInstitution[0].selectize;
                             </script>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Role:</label>
                             <div class="col-xs-8">
-                                <input name="role" type="text" class="form-control" placeholder="Optional">
+                                <input id="role" name="role" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Title:</label>
                             <div class="col-xs-8">
-                                <input name="title" type="text" class="form-control" placeholder="Optional">
+                                <input id="title" name="title" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Email:</label>
                             <div class="col-xs-8">
-                                <input name="email" type="text" class="form-control" placeholder="Optional">
+                                <input id="email" name="email" type="text" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -310,7 +315,9 @@
                 "columns": [ 
                     { "width": "5%" }, 
                     { "width": "0%" },
-                    { "width": "15%" }, 
+                    { "width": "7%" },
+                    { "width": "7%" },
+                    { "width": "0%" }, 
                     { "width": "15%" }, 
                     { "width": "13%" }, 
                     { "width": "27%" }, 
@@ -324,7 +331,7 @@
                     },
                     {   
                         visible: false,
-                        targets: 1
+                        targets: [1, 4]
                     } 
                 ],
                 select: {
@@ -360,6 +367,8 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#participantForm').closest('form')[0].reset();
+                                                        validatorParticipant.resetForm();
+                                                        controlSelectIns.clear();
                                                     }
                                                 }
                                             },
@@ -378,15 +387,13 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#participantForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#participantForm').find('[name="firstName"]').val(rowData[2].substr(0,rowData[2].indexOf(' '))).end();
-                                    $('#participantForm').find('[name="lastName"]').val(rowData[2].substr(rowData[2].indexOf(' ')+1)).end();
-                                    $('select[name=select-institution] option').filter(function() {
-                                        return $(this).text() == rowData[3]; 
-                                    }).prop('selected', true);
-                                    $('#participantForm').find('[name="role"]').val(rowData[4]).end();
-                                    $('#participantForm').find('[name="title"]').val(rowData[5]).end();
-                                    $('#participantForm').find('[name="email"]').val(rowData[6]).end();
+                                    $('#participant-id').val(rowData[1]).end();
+                                    $('#first-name').val(rowData[2]).end();
+                                    $('#last-name').val(rowData[3]).end();
+                                    controlSelectIns.setValue(rowData[4]);
+                                    $('#role').val(rowData[6]).end();
+                                    $('#title').val(rowData[7]).end();
+                                    $('#email').val(rowData[8]).end();
 
                                     bootbox
                                         .dialog({
@@ -409,6 +416,8 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#participantForm').closest('form')[0].reset();
+                                                        validatorParticipant.resetForm();
+                                                        controlSelectIns.clear();
                                                     }
                                                 }
                                             },
@@ -476,7 +485,7 @@
             /** 
             * Form validation code
             */
-            $('#participantForm').validate({
+            var validatorParticipant = $('#participantForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 rules: {
                     firstName: {
@@ -501,6 +510,9 @@
                         maxlength: 120,
                         regex: /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/
                     }
+                },
+                messages: {
+                    email: "Please check the email format."
                 },
                 highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');

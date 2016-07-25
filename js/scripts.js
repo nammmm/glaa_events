@@ -55,32 +55,32 @@ function addForm(form) {
         case '#institutionForm':
             var formData = {
                 table: 'Institutions',
-                institutionName: $('#institutionForm').find('[name="institutionName"]').val(),
+                institutionName: $('#institution-name').val(),
                 isGLCA: $('input[name=optionsRadiosInline]:checked').val()
             };
-            msg = "Institution \"" + $('#institutionForm').find('[name="institutionName"]').val() + "\" has been added.";
+            msg = "Institution \"" + formData['institutionName'] + "\" has been added.";
             break;
         case '#participantForm':
             var formData = {
                 table: 'Participants',
-                firstName: $('#participantForm').find('[name="firstName"]').val(),
-                lastName: $('#participantForm').find('[name="lastName"]').val(),
+                firstName: $('#first-name').val(),
+                lastName: $('#last-name').val(),
                 institutionID: $('#select-institution').val(),
-                role: $('#participantForm').find('[name="role"]').val(),
-                title: $('#participantForm').find('[name="title"]').val(),
-                email: $('#participantForm').find('[name="email"]').val()
+                role: $('#role').val(),
+                title: $('#title').val(),
+                email: $('#email').val()
             };
-            msg = "Participant \"" + $('#participantForm').find('[name="firstName"]').val() + " " + $('#participantForm').find('[name="lastName"]').val() + "\" has been added.";
+            msg = "Participant \"" + formData['firstName'] + " " + formData['lastName'] + "\" has been added.";
             break;
         case '#eventForm':
             var formData = {
                 table: 'Events',
-                name: $('#eventForm').find('[name="name"]').val(),
-                description: $('#eventForm').find('[name="description"]').val(),
+                eventName: $('#event-name').val(),
+                description: $('#event-description').val(),
                 academicYear: $('#select-year').val(),
                 hostID: $('#select-institution').val()
             };
-            msg = "Event \"" + $('#eventForm').find('[name="name"]').val() + "\" has been added.";
+            msg = "Event \"" + formData['eventName'] + "\" has been added.";
             break;
         case '#participationByPaForm':
             var eventsSelected = $('#select-events').val() || [];
@@ -111,7 +111,6 @@ function addForm(form) {
     }
 
     var scrollPosition = $(window).scrollTop();
-    // console.log(formData);
     $.ajax( {
         type: "POST",
         url: "../server_side/form_add.php",
@@ -140,42 +139,44 @@ function updateForm(form) {
         case '#institutionForm':
             var formData = {
                 table: 'Institutions',
-                institutionID: $('#institutionForm').find('[name="id"]').val(),
-                institutionName: $('#institutionForm').find('[name="institutionName"]').val(),
+                institutionID: $('#institution-id').val(),
+                institutionName: $('#institution-name').val(),
                 isGLCA: $('input[name=optionsRadiosInline]:checked').val()
             };
-            msg = "Record \"" + $('#institutionForm').find('[name="institutionName"]').val() + "\" has been update.";
+            msg = "Record \"" + formData['institutionName'] + "\" has been update.";
             break;
         case '#participantForm':
             var formData = {
                 table: 'Participants',
-                participantID: $('#participantForm').find('[name="id"]').val(),
-                firstName: $('#participantForm').find('[name="firstName"]').val(),
-                lastName: $('#participantForm').find('[name="lastName"]').val(),
-                institutionID: $('select[name=select-institution]').val(),
-                role: $('#participantForm').find('[name="role"]').val(),
-                title: $('#participantForm').find('[name="title"]').val(),
-                email: $('#participantForm').find('[name="email"]').val()
+                participantID: $('#participant-id').val(),
+                firstName: $('#first-name').val(),
+                lastName: $('#last-name').val(),
+                institutionID: $('#select-institution').val(),
+                role: $('#role').val(),
+                title: $('#title').val(),
+                email: $('#email').val()
             };
-            msg = "Record \"" + $('#participantForm').find('[name="firstName"]').val() + " " + $('#participantForm').find('[name="lastName"]').val() + "\" has been updated.";
+            msg = "Record \"" + formData['firstName'] + " " + formData['lastName'] + "\" has been updated.";
             break;
         case '#eventForm':
             var formData = {
                 table: 'Events',
-                eventID: $('#eventForm').find('[name="id"]').val(),
-                name: $('#eventForm').find('[name="name"]').val(),
-                description: $('#eventForm').find('[name="description"]').val(),
-                academicYear: $('select[name=select-year]').val(),
-                hostID: $('select[name=select-institution]').val()
+                eventID: $('#event-id').val(),
+                eventName: $('#event-name').val(),
+                description: $('#event-description').val(),
+                academicYear: $('#select-year').val(),
+                hostID: $('#select-institution').val()
             };
-            msg = "Record \"" + $('#eventForm').find('[name="name"]').val() + "\" has been updated.";
+            msg = "Record \"" + formData['name'] + "\" has been updated.";
             break;
-        case '#participationForm':
+        case '#participationByPaForm':
             var formData = {
                 table: 'Participations',
-                participantID: $('#participationForm').find('[name="participantID"]').val(),
-                eventID: $('#participationForm').find('[name="eventID"]').val()
+                participantID: $('#select-participant').val(),
+                eventID: $('#select-events-edit').val()
             };
+            break;
+        case '#participationByEvForm':
             break;
         default:
             break;

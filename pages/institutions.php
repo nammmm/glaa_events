@@ -208,11 +208,11 @@
 
                     <!-- The form which is used to populate the item data -->
                     <form id="institutionForm" method="post" class="form-horizontal" style="display: none;">
-                        <input type="hidden" name="id">
+                        <input type="hidden" id="institution-id">
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution Name:</label>
                             <div class="col-xs-8">
-                                <input name="institutionName" type="text" class="form-control" placeholder="Input can only contain characters and space">
+                                <input id="institution-name" name="institutionName" type="text" class="form-control" placeholder="Input can only contain characters and space">
                             </div>
                         </div>
                         <div class="form-group">
@@ -305,6 +305,7 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#institutionForm').closest('form')[0].reset();
+                                                        validatorInstitution.resetForm();
                                                     }
                                                 }
                                             },
@@ -323,8 +324,8 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#institutionForm').find('[name="institutionName"]').val(rowData[2]).end();
+                                    $('#institution-id').val(rowData[1]).end();
+                                    $('#institution-name').val(rowData[2]).end();
                                     if (rowData[3] === "Yes") {
                                         $("#isGLCATrue").prop("checked", true);
                                     }
@@ -353,6 +354,7 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#institutionForm').closest('form')[0].reset();
+                                                        validatorInstitution.resetForm();
                                                     }
                                                 }
                                             },
@@ -419,7 +421,7 @@
             /** 
             * Form validation code
             */
-            $('#institutionForm').validate({
+            var validatorInstitution = $('#institutionForm').validate({
                 rules: {
                     institutionName: {
                         maxlength: 100,

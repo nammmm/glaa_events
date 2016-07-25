@@ -29,7 +29,7 @@ if (isset($_POST['table'])) {
                     "VALUES('$firstName', '$lastName', $institutionID, '$role', '$title', '$email')";
 			break;
 		case 'Events':
-			$name = sanitizeMySQL($conn, $_POST['name']);
+			$name = sanitizeMySQL($conn, $_POST['eventName']);
 			$description = sanitizeMySQL($conn, $_POST['description']);
 			$academicYear = sanitizeMySQL($conn, $_POST['academicYear']);
 			$hostID = sanitizeMySQL($conn, $_POST['hostID']);

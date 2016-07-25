@@ -167,10 +167,11 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>ID</th>
+                                    <th>Event ID</th>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Year</th>
+                                    <th>Host ID</th>
                                     <th>Host</th>
                                 </tr>
                             </thead>
@@ -198,6 +199,7 @@
                                     <td><? echo $row['Name']; ?></td>
                                     <td><? echo $row['Description']; ?></td>
                                     <td><? echo $row['AcademicYear']; ?></td>
+                                    <td><? echo $row['HostID']; ?></td>
                                     <td><? echo getInstitution($conn, $row['HostID']); ?></td>
                                 </tr>
                                 <?php
@@ -210,23 +212,23 @@
 
                     <!-- The form which is used to populate the item data -->
                     <form id="eventForm" method="post" class="form-horizontal" style="display: none;">
-                        <input type="hidden" name="id">
+                        <input type="hidden" id="event-id">
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Name:</label>
                             <div class="col-xs-8">
-                                <input name="name" type="text" class="form-control">
+                                <input id="event-name" name="name" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Description:</label>
                             <div class="col-xs-8">
-                                <textarea name="description" class="form-control" rows="3" placeholder="Optional"></textarea>
+                                <textarea id="event-description" name="description" class="form-control" rows="3" placeholder="Optional"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Academic Year:</label>
                             <div class="col-xs-8">
-                                <select id="select-year" name="select-year" class="form-control">
+                                <select id="select-year" class="form-control">
                                 </select>
                             </div>
                             <script>
@@ -235,18 +237,19 @@
                                     $('#select-year').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
                                 }
                                 // selectize
-                                $('#select-year').selectize({
+                                var $selectizeYear = $('#select-year').selectize({
                                     sortField: {
                                         field: 'text',
                                         direction: 'desc'
                                     }
                                 });
+                                var controlSelectYear = $selectizeYear[0].selectize;
                             </script>
                         </div>
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Host Institution:</label>
                             <div class="col-xs-8">
-                                <select id="select-institution" name="select-institution" class="form-control" placeholder="Select institution" required>
+                                <select id="select-institution" class="form-control" placeholder="Select institution" required>
                                     <option>Select institution</option>
                                     <?php
                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
@@ -269,12 +272,13 @@
                                 </select>
                             </div>
                             <script>
-                                $('#select-institution').selectize({
+                                var $selectizeInstitution = $('#select-institution').selectize({
                                     sortField: {
                                         field: 'text',
                                         direction: 'asc'
                                     }
                                 });
+                                var controlSelectIns = $selectizeInstitution[0].selectize;
                             </script>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -312,6 +316,7 @@
                     { "width": "17%" }, 
                     { "width": "25%" }, 
                     { "width": "5%" },
+                    { "width": "0%" },
                     { "width": "17%" }
                 ],
                 columnDefs: [ 
@@ -322,7 +327,7 @@
                     },
                     {   
                         visible: false,
-                        targets: 1
+                        targets: [1, 5]
                     } 
                 ],
                 select: {
@@ -349,7 +354,6 @@
                                                         if (!$('#eventForm').valid()) {
                                                             return false;
                                                         }
-                                                        // console.log($('#select-institution').find(":selected").text());
                                                         $('#form-update').val("add").end();
                                                         $('button#form-update').click();
                                                     }
@@ -359,6 +363,9 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#eventForm').closest('form')[0].reset();
+                                                        validatorEvent.resetForm();
+                                                        controlSelectYear.clear();
+                                                        controlSelectIns.clear();
                                                     }
                                                 }
                                             },
@@ -377,15 +384,11 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#eventForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#eventForm').find('[name="name"]').val(rowData[2]).end();
-                                    $('#eventForm').find('[name="description"]').val(rowData[3]).end();
-                                    $('select[name=select-year] option').filter(function() {
-                                        return $(this).text() == rowData[4]; 
-                                    }).prop('selected', true);
-                                    $('select[name=select-institution] option').filter(function() {
-                                        return $(this).text() == rowData[5]; 
-                                    }).prop('selected', true);
+                                    $('#event-id').val(rowData[1]).end();
+                                    $('#event-name').val(rowData[2]).end();
+                                    $('#event-description').val(rowData[3]).end();
+                                    controlSelectYear.setValue(rowData[4]);
+                                    controlSelectIns.setValue(rowData[5]);
 
                                     bootbox
                                         .dialog({
@@ -408,6 +411,9 @@
                                                     className: 'btn btn-default',
                                                     callback: function() {
                                                         $('#eventForm').closest('form')[0].reset();
+                                                        validatorEvent.resetForm();
+                                                        controlSelectYear.clear();
+                                                        controlSelectIns.clear();
                                                     }
                                                 }
                                             },
@@ -427,8 +433,8 @@
                                 text: 'Delete',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    $('#eventForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#eventForm').find('[name="name"]').val(rowData[2]).end();
+                                    $('#event-id').val(rowData[1]).end();
+                                    $('#event-name').val(rowData[2]).end();
 
                                     bootbox
                                         .confirm( {
@@ -474,7 +480,7 @@
             /** 
             * Form validation code
             */
-            $('#eventForm').validate({
+            var validatorEvent = $('#eventForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 rules: {
                     name: {

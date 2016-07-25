@@ -36,9 +36,10 @@ if (isset($_POST['table'])) {
 						"Title = '$title', " . 
 						"Email = '$email' " . 
 						"WHERE ParticipantID = $participantID";
+			break;
 		case 'Events':
 			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
-			$name = sanitizeMySQL($conn, $_POST['name']);
+			$name = sanitizeMySQL($conn, $_POST['eventName']);
 			$description = sanitizeMySQL($conn, $_POST['description']);
 			$academicYear = sanitizeMySQL($conn, $_POST['academicYear']);
 			$hostID = sanitizeMySQL($conn, $_POST['hostID']);
@@ -55,7 +56,7 @@ if (isset($_POST['table'])) {
 			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
 			
 			$query = "UPDATE Participations SET " .
-						"EventID = '$eventID', " . 
+						"EventID = $eventID " . 
 						"WHERE ParticipantID = $participantID";
 			break;
 		default:

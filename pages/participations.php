@@ -255,7 +255,7 @@
                         <!-- /.Select participant -->
 
                         <!-- Select event -->
-                        <div class="form-group">
+                        <div id="div-select-events" class="form-group">
                             <label class="control-label" style="padding-bottom: 6px;">Select Events</label>
                             <select id="select-events" name="select-events" multiple class="form-control" placeholder="Select events" required>
                                 <option>Select events</option>
@@ -270,6 +270,23 @@
                                 }
                             });
                             var controlSelectEvs = $selectizeEvents[0].selectize;
+                        </script>
+
+                        <!-- Edit Mode: Select event -->
+                        <div id="div-select-events-edit" class="form-group" style="display: none;">
+                            <label class="control-label" style="padding-bottom: 6px;">Select Event</label>
+                            <select id="select-events-edit" class="form-control" required>
+                            </select>
+                        </div>
+                        <script>
+                            // Selectize events select
+                            var $selectizeEventsEdit = $('#select-events-edit').selectize({
+                                sortField: {
+                                    field: 'text',
+                                    direction: 'asc'
+                                }
+                            });
+                            var controlSelectEvsEdit = $selectizeEventsEdit[0].selectize;
 
                             $('#select-participant').change(function() {
                                 var pa_selected = $('#select-participant').val();
@@ -285,10 +302,9 @@
                                         },
                                         dataType: 'JSON',
                                         success: function(data) {
-                                            var selector = $('#select-events').selectize()[0].selectize;
-                                            selector.clearOptions();
+                                            controlSelectEvs.clearOptions();
                                             $.each(data, function(){
-                                                selector.addOption([{
+                                                controlSelectEvs.addOption([{
                                                     value: this.EventID,
                                                     text: this.Name
                                                 }]);
@@ -298,6 +314,7 @@
                                 }
                             });
                         </script>
+
                         <button type="submit" id="form-update-by-pa" class="hidden"></button>
                     </form>
                     <!-- /hidden form -->
@@ -373,10 +390,9 @@
                                         data: formdata,
                                         dataType: 'JSON',
                                         success: function(data) {
-                                            var selector = $('#select-participants').selectize()[0].selectize;
-                                            selector.clearOptions();
+                                            controlSelectPas.clearOptions();
                                             $.each(data, function(){
-                                                selector.addOption([{
+                                                controlSelectPas.addOption([{
                                                     value: this.ParticipantID,
                                                     text: this.FirstName + " " + this.LastName + " <" + this.Institution + ">"
                                                 }]);
@@ -448,6 +464,10 @@
                             {
                                 text: 'Add By Participant',
                                 action: function ( e, dt, node, config ) {
+                                    $('#div-select-events-edit').hide();
+                                    $('#div-select-events').show();
+                                    controlSelectPa.enable();
+
                                     bootbox
                                         .dialog({
                                             title: 'Add participation',
@@ -460,8 +480,6 @@
                                                         if (!$('#participationByPaForm').valid()) {
                                                             return false;
                                                         }
-                                                        // var temp = $('#select-events').val();
-                                                        // alert(temp);
                                                         $('#form-update-by-pa').val("add").end();
                                                         $('button#form-update-by-pa').click();
                                                     }
@@ -470,7 +488,7 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
-                                                        // clear selectize options
+                                                        validatorParticipationByPa.resetForm();
                                                         controlSelectPa.clear();
                                                         controlSelectEvs.clear();
                                                     }
@@ -510,6 +528,7 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
+                                                        validatorParticipationByEv.resetForm();
                                                         controlSelectEv.clear();
                                                         controlSelectPas.clear();
                                                     }
@@ -530,23 +549,44 @@
                                 text: 'Edit',
                                 action: function ( e, dt, node, config ) {
                                     var rowData = dt.row( { selected: true } ).data();
-                                    alert(rowData);
-                                    $('select[name=select-participant] option').filter(function() {
-                                        return $(this).text() == rowData[2]; 
-                                    }).prop('selected', true);
-                                    // $('select[name=select-institution]').prop('disabled', true);
-                                    // $('#select-participants-group').hide();
-                                    // $('#participant-group').show();
-                                    // $('#participationForm').find('[name="participant"]').text(rowData[3]).end();
-                                    // $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
-                                    // $('select[name=select-event] option').filter(function() {
-                                    //     return $(this).text() == rowData[5]; 
-                                    // }).prop('selected', true);
+
+                                    controlSelectPa.setValue(rowData[1]);
+                                    controlSelectPa.disable();
+
+                                    $.ajax( {
+                                        type: 'POST',
+                                        url: '../server_side/server_processing.php',
+                                        data: {
+                                            file: "participations",
+                                            participantID: rowData[1]
+                                        },
+                                        dataType: 'JSON',
+                                        success: function(data) {
+                                            // Fill single select event
+                                            controlSelectEvsEdit.clearOptions();
+                                            $.each(data, function(){
+                                                controlSelectEvsEdit.addOption([{
+                                                    value: this.EventID,
+                                                    text: this.Name
+                                                }]);
+                                            } );
+                                            // Manually add current event option
+                                            controlSelectEvsEdit.addOption({
+                                                value: rowData[4],
+                                                text: rowData[5]
+                                            });
+                                            // Set value to be the current event
+                                            controlSelectEvsEdit.setValue(rowData[4]);
+                                        }
+                                    } );
+                                    
+                                    $('#div-select-events').hide();
+                                    $('#div-select-events-edit').show();
 
                                     bootbox
                                         .dialog({
                                             title: 'Edit participation',
-                                            message: $('#participationForm'),
+                                            message: $('#participationByPaForm'),
                                             buttons: {
                                                 update: {
                                                     label: 'Update',
@@ -563,10 +603,9 @@
                                                     label: 'Cancel',
                                                     className: 'btn btn-default',
                                                     callback: function() {
-                                                        $('#participationByPaForm').closest('form')[0].reset();
-                                                        $('select[name=select-institution]').prop('disabled', false);
-                                                        $('#participant-group').hide();
-                                                        $('#select-participants-group').show();
+                                                        validatorParticipationByPa.resetForm();
+                                                        controlSelectPa.clear();
+                                                        controlSelectEvsEdit.clear();
                                                     }
                                                 }
                                             },
@@ -633,7 +672,7 @@
             /** 
             * Form validation code
             */
-            $('#participationByPaForm').validate({
+            var validatorParticipationByPa = $('#participationByPaForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
@@ -652,7 +691,7 @@
                 }
             });
 
-            $('#participationByEvForm').validate({
+            var validatorParticipationByEv = $('#participationByEvForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
                 highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
