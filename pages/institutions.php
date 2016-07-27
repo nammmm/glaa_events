@@ -247,6 +247,7 @@
 
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
+        var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
             checkAlert();
             var table = $('#institutionsTable').DataTable( {
@@ -273,7 +274,7 @@
                     } 
                 ],
                 select: {
-                    style: 'os'
+                    style: 'multi'
                 },
                 order: [[ 1, 'asc' ]],
                 responsive: true,
@@ -373,9 +374,6 @@
                             {
                                 text: 'Delete',
                                 action: function ( e, dt, node, config ) {
-                                    var rowData = dt.row( { selected: true } ).data();
-                                    $('#institutionForm').find('[name="id"]').val(rowData[1]).end();
-                                    $('#institutionForm').find('[name="institutionName"]').val(rowData[2]).end();
 
                                     bootbox
                                         .confirm( {
@@ -394,6 +392,7 @@
                                             },
                                             callback: function(result) {
                                                 if (result) {
+                                                    rowsData = table.rows('.selected').data().toArray();
                                                     $('#form-update').val("delete").end();
                                                     $('button#form-update').click();
                                                 }
@@ -414,8 +413,11 @@
             } );
 
             table.on( 'deselect', function () {
-                table.button( 1 ).disable();
-                table.button( 2 ).disable();
+                var count = table.rows( { selected: true } ).count();
+                if (!count) {
+                    table.button( 1 ).disable();
+                    table.button( 2 ).disable();
+                }
             } );
 
             /** 

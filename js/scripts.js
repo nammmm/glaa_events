@@ -206,46 +206,40 @@ function updateForm(form) {
 
 // Delete data
 function deleteForm(form) {
-    var msg = "Record has been deleted.";
-    switch(form) {
-        case '#institutionForm':
-            var formData = {
-                table: 'Institutions',
-                institutionID: $('#institutionForm').find('[name="id"]').val()
-            };
-            msg = "Record \"" + $('#institutionForm').find('[name="institutionName"]').val() + "\" has been deleted.";
-            break;
-        case '#participantForm':
-            var formData = {
-                table: 'Participants',
-                participantID: $('#participantForm').find('[name="id"]').val()
-            };
-            msg = "Record \"" + $('#participantForm').find('[name="firstName"]').val() + " " + $('#participantForm').find('[name="lastName"]').val() + "\" has been deleted.";
-            break;
-        case '#eventForm':
-            var formData = {
-                table: 'Events',
-                eventID: $('#eventForm').find('[name="id"]').val()
-            };
-            msg = "Record \"" + $('#eventForm').find('[name="name"]').val() + "\" has been deleted.";
-            break;
-        case '#participationForm':
-            var formData = {
-                table: 'Participations',
-                participantID: $('#participationForm').find('[name="participantID"]').val(),
-                eventID: $('#participationForm').find('[name="eventID"]').val()
-            };
-            break;
-        default:
-            break;
+    var msg = "Records have been deleted." 
+    var formData = {
+        table: 'Participations',
+        rows: rowsData
+    };
+    
+    var rowsLength = rowsData.length;
+    if (rowsLength == 1) {
+        switch(form) {
+            case '#institutionForm':
+                msg = "Record \"" + rowsData[0][2] + "\" has been deleted.";
+                break;
+            case '#participantForm':
+                msg = "Record \"" + rowsData[0][2] + " " + rowsData[0][3] + "\" has been deleted.";
+                break;
+            case '#eventForm':
+                msg = "Record \"" + rowsData[0][2] + "\" has been deleted.";
+                break;
+            case '#participationByPaForm':
+                msg = "Record \"" + rowsData[0][3] + " - " + rowsData[0][5] + "\" has been deleted.";
+                break;
+            default:
+                break;
+        }
     }
 
     var scrollPosition = $(window).scrollTop();
+    console.log(formData);
     $.ajax( {
         type: "POST",
         url: "../server_side/form_delete.php",
         data: formData,
         success: function(text) {
+            console.log(text);
             if (text == "success") {
                 localStorage.setItem('form', 'true');
                 localStorage.setItem('msg', msg);

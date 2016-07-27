@@ -423,6 +423,7 @@
 
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
+        var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
             checkAlert();
             var table = $('#participationsTable').DataTable( {
@@ -453,7 +454,7 @@
                     } 
                 ],
                 select: {
-                    style: 'os'
+                    style: 'multi'
                 },
                 order: [[ 1, 'asc' ]],
                 responsive: true,
@@ -624,9 +625,6 @@
                             {
                                 text: 'Delete',
                                 action: function ( e, dt, node, config ) {
-                                    var rowData = dt.row( { selected: true } ).data();
-                                    $('#participationForm').find('[name="participantID"]').val(rowData[1]).end();
-                                    $('#participationForm').find('[name="eventID"]').val(rowData[4]).end();
 
                                     bootbox
                                         .confirm( {
@@ -645,6 +643,7 @@
                                             },
                                             callback: function(result) {
                                                 if (result) {
+                                                    rowsData = table.rows('.selected').data().toArray();
                                                     $('#form-update-by-pa').val("delete").end();
                                                     $('button#form-update-by-pa').click();
                                                 }
@@ -660,14 +659,20 @@
             } );
 
             table.on( 'select', function () {
-                table.button( 1 ).enable();
                 table.button( 2 ).enable();
+                table.button( 3 ).enable();
             } );
 
             table.on( 'deselect', function () {
-                table.button( 1 ).disable();
-                table.button( 2 ).disable();
+                var count = table.rows( { selected: true } ).count();
+                if (!count) {
+                    table.button( 2 ).disable();
+                    table.button( 3 ).disable();
+                }
             } );
+
+            var count = table.rows( { selected: true } ).count();
+            if (count > 1)  table.button( 2 ).disable();
 
             /** 
             * Form validation code

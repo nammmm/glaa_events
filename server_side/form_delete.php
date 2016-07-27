@@ -6,43 +6,60 @@ if ($conn->connect_error) die($conn->connect_error);
 
 if (isset($_POST['table'])) {
 	$table = sanitizeMySQL($conn, $_POST['table']);
+	$rows = $_POST['rows'];
 	$query = "";
+	$msg = "success";
 
 	switch ($table) {
 		case 'Institutions':
-			$institutionID = sanitizeMySQL($conn, $_POST['institutionID']);
-
-			$query = "DELETE FROM Institutions " . 
-						"WHERE InstitutionID = $institutionID";
+			foreach ($rows as $row) {
+				$query = "DELETE FROM Institutions " . 
+						"WHERE InstitutionID = $row[1]";
+				$result = $conn->query($query);
+				if (!$result) {
+					$msg = "$conn->error";
+					break;
+				}
+			}
 			break;
 		case 'Participants':
-			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
-
-			$query = "DELETE FROM Participants " . 
-						"WHERE ParticipantID = $participantID";
+			foreach ($rows as $row) {
+				$query = "DELETE FROM Participants " . 
+						"WHERE ParticipantID = $row[1]";
+				$result = $conn->query($query);
+				if (!$result) {
+					$msg = "$conn->error";
+					break;
+				}
+			}
 			break;
 		case 'Events':
-			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
-
-			$query = "DELETE FROM Events " . 
-						"WHERE EventID = $eventID";
+			foreach ($rows as $row) {
+				$query = "DELETE FROM Events " . 
+						"WHERE EventID = $row[1]";
+				$result = $conn->query($query);
+				if (!$result) {
+					$msg = "$conn->error";
+					break;
+				}
+			}
 			break;
 		case 'Participations':
-			$participantID = sanitizeMySQL($conn, $_POST['participantID']);
-			$eventID = sanitizeMySQL($conn, $_POST['eventID']);
-
-			$query = "DELETE FROM Participations " . 
-						"WHERE ParticipantID = $participantID AND EventID = $eventID";
+			foreach ($rows as $row) {
+				$query = "DELETE FROM Participations " . 
+						"WHERE ParticipantID = $row[1] AND EventID = $row[4]";
+				$result = $conn->query($query);
+				if (!$result) {
+					$msg = "$conn->error";
+					break;
+				}
+			}
 			break;
 		default:
 			break;
 	}
 
-	$result = $conn->query($query);
-	if (!$result) 
-		echo "$conn->error";
-	else
-		echo "success";
+	echo $msg;
 }
 $conn->close();
 ?>
