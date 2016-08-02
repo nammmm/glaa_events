@@ -5,6 +5,8 @@ if (isset($_POST['file'])) {
 	$conn = new mysqli($hn, $un, $pw, $db);
 	if ($conn->connect_error) die($conn->connect_error);
 
+	$conn->set_charset('utf8mb4');
+
 	if (isset($_POST['participantID'])) { 
 		$participantID = sanitizeMySQL($conn, $_POST['participantID']);
 
@@ -93,24 +95,26 @@ function getInstitutionByType($connection, $id, $type)
 function updateReport() {
 	$query = "";
 
-	$institutionID = $_POST['select-institution'];
-	$eventID = $_POST['select-event'];
-	$academicYear = $_POST['select-year'];
-	$hostID = $_POST['select-host'];
+	$institutionID = $_POST['selectInstitution'];
+	$eventID = $_POST['selectEvent'];
+	$academicYear = $_POST['selectYear'];
+	$hostID = $_POST['selectHost'];
 
-	if ($institutionID == "All" && $eventID == "All" && $academicYear == "All" && $hostID == "All") {
+	$all = -1;	// Option All
+
+	if ($institutionID == $all && $eventID == $all && $academicYear == $all && $hostID == $all) {
 		$query = "SELECT * FROM Participations";
 	}
 	// 4 choose 3
-	elseif ($institutionID != "All" && $eventID != "All" && $academicYear != "All") {
+	elseif ($institutionID != $all && $eventID != $all && $academicYear != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE pa.InstitutionID = $institutionID AND ev.EventID = $eventID AND ev.AcademicYear = $academicYear";
+					"WHERE pa.InstitutionID = $institutionID AND ev.EventID = $eventID AND ev.AcademicYear = '$academicYear'";
 	}
-	elseif ($institutionID != "All" && $eventID != "All" && $hostID != "All") {
+	elseif ($institutionID != $all && $eventID != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
@@ -118,22 +122,22 @@ function updateReport() {
 					"ON ev.EventID = pp.EventID " . 
 					"WHERE pa.InstitutionID = $institutionID AND ev.EventID = $eventID AND ev.HostID = $hostID";
 	}
-	elseif ($institutionID != "All" && $academicYear != "All" && $hostID != "All") {
+	elseif ($institutionID != $all && $academicYear != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE pa.InstitutionID = $institutionID AND ev.AcademicYear = $academicYear AND ev.HostID = $hostID";
+					"WHERE pa.InstitutionID = $institutionID AND ev.AcademicYear = '$academicYear' AND ev.HostID = $hostID";
 	}
-	elseif ($eventID != "All" && $academicYear != "All" && $hostID != "All") {
+	elseif ($eventID != $all && $academicYear != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " .  
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE ev.EventID = $eventID AND ev.AcademicYear = $academicYear AND ev.HostID = $hostID";
+					"WHERE ev.EventID = $eventID AND ev.AcademicYear = '$academicYear' AND ev.HostID = $hostID";
 	}
 	// 4 choose 2
-	elseif ($institutionID != "All" && $eventID != "All") {
+	elseif ($institutionID != $all && $eventID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
@@ -141,15 +145,15 @@ function updateReport() {
 					"ON ev.EventID = pp.EventID " . 
 					"WHERE pa.InstitutionID = $institutionID AND ev.EventID = $eventID";
 	}
-	elseif ($institutionID != "All" && $academicYear != "All") {
+	elseif ($institutionID != $all && $academicYear != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE pa.InstitutionID = $institutionID AND ev.AcademicYear = $academicYear";
+					"WHERE pa.InstitutionID = $institutionID AND ev.AcademicYear = '$academicYear'";
 	}
-	elseif ($institutionID != "All" && $hostID != "All") {
+	elseif ($institutionID != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
@@ -157,44 +161,44 @@ function updateReport() {
 					"ON ev.EventID = pp.EventID " . 
 					"WHERE pa.InstitutionID = $institutionID AND ev.HostID = $hostID";
 	}
-	elseif ($eventID != "All" && $academicYear != "All") {
+	elseif ($eventID != $all && $academicYear != $all) {
 		$query = "SELECT * FROM Participations pp " .  
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE ev.EventID = $eventID AND ev.AcademicYear = $academicYear";
+					"WHERE ev.EventID = $eventID AND ev.AcademicYear = '$academicYear'";
 	}
-	elseif ($eventID != "All" && $hostID != "All") {
+	elseif ($eventID != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " .  
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
 					"WHERE ev.EventID = $eventID AND ev.HostID = $hostID";
 	}
-	elseif ($academicYear != "All" && $hostID != "All") {
+	elseif ($academicYear != $all && $hostID != $all) {
 		$query = "SELECT * FROM Participations pp " .  
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE ev.AcademicYear = $academicYear AND ev.HostID = $hostID";
+					"WHERE ev.AcademicYear = '$academicYear' AND ev.HostID = $hostID";
 	}
 	// 4 choose 1
-	elseif ($institutionID != "All") {
+	elseif ($institutionID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Participants pa " . 
 					"ON pa.ParticipantID = pp.ParticipantID " . 
 					"WHERE pa.InstitutionID = $institutionID";
 	}
-	elseif ($eventID != "All") {
+	elseif ($eventID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
 					"WHERE ev.EventID = $eventID";
 	}
-	elseif ($academicYear != "All") {
+	elseif ($academicYear != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 
-					"WHERE ev.AcademicYear = $academicYear";
+					"WHERE ev.AcademicYear = '$academicYear'";
 	}
-	elseif ($hostID != "All") {
+	elseif ($hostID != $all) {
 		$query = "SELECT * FROM Participations pp " . 
 					"LEFT JOIN Events ev " . 
 					"ON ev.EventID = pp.EventID " . 

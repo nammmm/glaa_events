@@ -135,9 +135,10 @@ function addForm(form) {
 // Modify data in database
 function updateForm(form) {
     var msg = "Record has been updated.";
+    var formData;
     switch(form) {
         case '#institutionForm':
-            var formData = {
+            formData = {
                 table: 'Institutions',
                 institutionID: $('#institution-id').val(),
                 institutionName: $('#institution-name').val(),
@@ -146,7 +147,7 @@ function updateForm(form) {
             msg = "Record \"" + formData['institutionName'] + "\" has been update.";
             break;
         case '#participantForm':
-            var formData = {
+            formData = {
                 table: 'Participants',
                 participantID: $('#participant-id').val(),
                 firstName: $('#first-name').val(),
@@ -159,7 +160,7 @@ function updateForm(form) {
             msg = "Record \"" + formData['firstName'] + " " + formData['lastName'] + "\" has been updated.";
             break;
         case '#eventForm':
-            var formData = {
+            formData = {
                 table: 'Events',
                 eventID: $('#event-id').val(),
                 eventName: $('#event-name').val(),
@@ -170,13 +171,11 @@ function updateForm(form) {
             msg = "Record \"" + formData['name'] + "\" has been updated.";
             break;
         case '#participationByPaForm':
-            var formData = {
+            formData = {
                 table: 'Participations',
                 participantID: $('#select-participant').val(),
                 eventID: $('#select-events-edit').val()
             };
-            break;
-        case '#participationByEvForm':
             break;
         default:
             break;
@@ -208,7 +207,7 @@ function updateForm(form) {
 function deleteForm(form) {
     var msg = "Records have been deleted." 
     var formData = {
-        table: 'Participations',
+        form: form,
         rows: rowsData
     };
     
@@ -233,13 +232,11 @@ function deleteForm(form) {
     }
 
     var scrollPosition = $(window).scrollTop();
-    console.log(formData);
     $.ajax( {
         type: "POST",
         url: "../server_side/form_delete.php",
         data: formData,
         success: function(text) {
-            console.log(text);
             if (text == "success") {
                 localStorage.setItem('form', 'true');
                 localStorage.setItem('msg', msg);
@@ -261,38 +258,30 @@ function deleteForm(form) {
  ***************************************************************************/
 
 function saveReportFilters() {
-    localStorage.setItem('select-institution', $('select[name=select-institution]').val());
-    localStorage.setItem('select-event', $('select[name=select-event]').val());
-    localStorage.setItem('select-year', $('select[name=select-year]').val());
-    localStorage.setItem('select-host', $('select[name=select-host]').val());
+    localStorage.setItem('selectInstitution', $('#select-institution').val());
+    localStorage.setItem('selectEvent', $('#select-event').val());
+    localStorage.setItem('selectYear', $('#select-year').val());
+    localStorage.setItem('selectHost', $('#select-host').val());
     localStorage.setItem('scrollPosition', $(window).scrollTop());
 }
 
 function loadReportFilters() {
-    var selectIns = localStorage.getItem('select-institution');
-    var selectEvent = localStorage.getItem('select-event');
-    var selectYear = localStorage.getItem('select-year');
-    var selectHost = localStorage.getItem('select-host');
+    var selectIns = localStorage.getItem('selectInstitution');
+    var selectEvent = localStorage.getItem('selectEvent');
+    var selectYear = localStorage.getItem('selectYear');
+    var selectHost = localStorage.getItem('selectHost');
     var scrollPosition = localStorage.getItem('scrollPosition');
-    if (selectIns != 'empty') {
-        $('select[name=select-institution] option').filter(function() {
-            return $(this).val() == selectIns; 
-        }).prop('selected', true);
-        $('select[name=select-event] option').filter(function() {
-            return $(this).val() == selectEvent; 
-        }).prop('selected', true);
-        $('select[name=select-year] option').filter(function() {
-            return $(this).val() == selectYear; 
-        }).prop('selected', true);
-        $('select[name=select-host] option').filter(function() {
-            return $(this).val() == selectHost; 
-        }).prop('selected', true);
+    if (selectIns != "All") {
+        controlSelectIns.setValue(selectIns);
+        controlSelectEv.setValue(selectEvent);
+        controlSelectYear.setValue(selectYear);
+        controlSelectHost.setValue(selectHost);
         $(window).scrollTop(scrollPosition);
     }
-    localStorage.setItem('select-institution', 'All');
-    localStorage.setItem('select-event', 'All');
-    localStorage.setItem('select-year', 'All');
-    localStorage.setItem('select-host', 'All');
+    localStorage.setItem('selectInstitution', 'All');
+    localStorage.setItem('selectEvent', 'All');
+    localStorage.setItem('selectYear', 'All');
+    localStorage.setItem('selectHost', 'All');
     localStorage.setItem('scrollPosition', 'empty');
 }
 

@@ -91,13 +91,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -126,6 +123,8 @@
                     require_once '../server_side/server_processing.php';
                     $conn = new mysqli($hn, $un, $pw, $db);
                     if ($conn->connect_error) die($conn->connect_error);
+
+                    $conn->set_charset('utf8mb4');
                     ?>
 
                     <!-- Institutions -->

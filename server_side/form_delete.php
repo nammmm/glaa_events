@@ -4,14 +4,16 @@ require_once 'helper.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
 
-if (isset($_POST['table'])) {
-	$table = sanitizeMySQL($conn, $_POST['table']);
+$conn->set_charset('utf8mb4');
+
+if (isset($_POST['form'])) {
+	$form = sanitizeMySQL($conn, $_POST['form']);
 	$rows = $_POST['rows'];
 	$query = "";
 	$msg = "success";
 
-	switch ($table) {
-		case 'Institutions':
+	switch ($form) {
+		case '#institutionForm':
 			foreach ($rows as $row) {
 				$query = "DELETE FROM Institutions " . 
 						"WHERE InstitutionID = $row[1]";
@@ -22,7 +24,7 @@ if (isset($_POST['table'])) {
 				}
 			}
 			break;
-		case 'Participants':
+		case '#participantForm':
 			foreach ($rows as $row) {
 				$query = "DELETE FROM Participants " . 
 						"WHERE ParticipantID = $row[1]";
@@ -33,7 +35,7 @@ if (isset($_POST['table'])) {
 				}
 			}
 			break;
-		case 'Events':
+		case '#eventForm':
 			foreach ($rows as $row) {
 				$query = "DELETE FROM Events " . 
 						"WHERE EventID = $row[1]";
@@ -44,7 +46,7 @@ if (isset($_POST['table'])) {
 				}
 			}
 			break;
-		case 'Participations':
+		case '#participationByPaForm':
 			foreach ($rows as $row) {
 				$query = "DELETE FROM Participations " . 
 						"WHERE ParticipantID = $row[1] AND EventID = $row[4]";
@@ -60,6 +62,8 @@ if (isset($_POST['table'])) {
 	}
 
 	echo $msg;
+
+	$result->close();
+	$conn->close();
 }
-$conn->close();
 ?>

@@ -130,13 +130,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -169,8 +166,8 @@
                                     <th></th>
                                     <th>Event ID</th>
                                     <th>Name</th>
-                                    <th>Description</th>
                                     <th>Year</th>
+                                    <th>Description</th>
                                     <th>Host ID</th>
                                     <th>Host</th>
                                 </tr>
@@ -182,6 +179,8 @@
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
+                            $conn->set_charset('utf8mb4');
+                            
                             $query  = "SELECT * FROM Events";
                             $result = $conn->query($query);
                             if (!$result) 
@@ -197,8 +196,8 @@
                                     <td></td>
                                     <td><? echo $row['EventID']; ?></td>
                                     <td><? echo $row['Name']; ?></td>
-                                    <td><? echo $row['Description']; ?></td>
                                     <td><? echo $row['AcademicYear']; ?></td>
+                                    <td><? echo $row['Description']; ?></td>
                                     <td><? echo $row['HostID']; ?></td>
                                     <td><? echo getInstitution($conn, $row['HostID']); ?></td>
                                 </tr>
@@ -228,7 +227,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Academic Year:</label>
                             <div class="col-xs-8">
-                                <select id="select-year" class="form-control">
+                                <select id="select-year" name="selectYear" class="form-control" placeholder="Select academic year">
                                 </select>
                             </div>
                             <script>
@@ -249,7 +248,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Host Institution:</label>
                             <div class="col-xs-8">
-                                <select id="select-institution" class="form-control" placeholder="Select institution" required>
+                                <select id="select-institution" name="selectInstitution" class="form-control" placeholder="Select institution">
                                     <option>Select institution</option>
                                     <?php
                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
@@ -300,7 +299,7 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <!-- Page-Level Scripts -->
     <script>
         var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
@@ -308,15 +307,19 @@
             var table = $('#eventsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
-                    "emptyTable": "There is no event at this point"
+                    "emptyTable": "There is no event at this point",
+                    buttons: {
+                        selectAll: "Select all items",
+                        selectNone: "Select none"
+                    }
                 },
                 "autoWidth": false,
                 "columns": [ 
                     { "width": "5%" }, 
                     { "width": "0%" },
-                    { "width": "17%" }, 
-                    { "width": "25%" }, 
+                    { "width": "15%" },
                     { "width": "5%" },
+                    { "width": "27%" },
                     { "width": "0%" },
                     { "width": "17%" }
                 ],
@@ -340,6 +343,8 @@
                     var api = this.api();
                     new $.fn.dataTable.Buttons(api, {
                         buttons: [
+                            'selectAll',
+                            'selectNone',
                             {
                                 text: 'New',
                                 action: function ( e, dt, node, config ) {
@@ -387,8 +392,8 @@
                                     var rowData = dt.row( { selected: true } ).data();
                                     $('#event-id').val(rowData[1]).end();
                                     $('#event-name').val(rowData[2]).end();
-                                    $('#event-description').val(rowData[3]).end();
-                                    controlSelectYear.setValue(rowData[4]);
+                                    controlSelectYear.setValue(rowData[3]);
+                                    $('#event-description').val(rowData[4]).end();
                                     controlSelectIns.setValue(rowData[5]);
 
                                     bootbox
@@ -467,15 +472,16 @@
             } );
 
             table.on( 'select', function () {
-                table.button( 1 ).enable();
-                table.button( 2 ).enable();
+                table.button( 3 ).enable();
+                table.button( 4 ).enable();
             } );
 
             table.on( 'deselect', function () {
                 var count = table.rows( { selected: true } ).count();
+                console.log(count);
                 if (!count) {
-                    table.button( 1 ).disable();
-                    table.button( 2 ).disable();
+                    table.button( 3 ).disable();
+                    table.button( 4 ).disable();
                 }
             } );
 
@@ -489,6 +495,12 @@
                         maxlength: 100,
                         required: true,
                         regex: /^[A-Za-z0-9\s]{1,}$/
+                    },
+                    selectYear: {
+                        required: true
+                    },
+                    selectInstitution: {
+                        required: true
                     },
                     description: {
                         maxlength: 255

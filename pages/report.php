@@ -125,13 +125,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -164,6 +161,8 @@
                                 require_once '../server_side/server_processing.php';
                                 $conn = new mysqli($hn, $un, $pw, $db);
                                 if ($conn->connect_error) die($conn->connect_error);
+
+                                $conn->set_charset('utf8mb4');
                                 ?>
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -172,8 +171,8 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose institution:</label>
                                             <div class="col-xs-8">
-                                                <select id="select-institution" name="select-institution" class="form-control">
-                                                    <option value="-1">All</option>
+                                                <select id="select-institution" name="selectInstitution" class="form-control" required>
+                                                    <option value="-1">-All-</option>
                                                     <?php
                                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
                                                     $result = $conn->query($query);
@@ -193,12 +192,13 @@
                                                 </select>
                                             </div>
                                             <script>
-                                                $('#select-institution').selectize({
+                                                var $selectizeInstitution = $('#select-institution').selectize({
                                                     sortField: {
                                                         field: 'text',
                                                         direction: 'asc'
                                                     }
                                                 });
+                                                var controlSelectIns = $selectizeInstitution[0].selectize;
                                             </script>
                                         </div>
 
@@ -206,22 +206,23 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose year:</label>
                                             <div class="col-xs-8">
-                                                <select id="select-year" name="select-year" class="form-control">
-                                                    <option value="-1">All</option>
+                                                <select id="select-year" name="selectYear" class="form-control">
+                                                    <option value="-1">-All-</option>
                                                 </select>
                                             </div>
                                             <script>
                                                 // fill year options
-                                                for (i = new Date().getFullYear(); i >= 2015; i--) {
-                                                    $('select[name=select-year]').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
+                                                for (var i = new Date().getFullYear(); i >= 2015; i--) {
+                                                    $('#select-year').append($('<option />').val( i.toString()+"-"+(i+1).toString().substring(2) ).html( i.toString()+"-"+(i+1).toString().substring(2) ));
                                                 }
                                                 // selectize
-                                                $('#select-year').selectize({
+                                                var $selectizeYear = $('#select-year').selectize({
                                                     sortField: {
                                                         field: 'text',
                                                         direction: 'desc'
                                                     }
                                                 });
+                                                var controlSelectYear = $selectizeYear[0].selectize;
                                             </script>
                                         </div>
                                     </div>
@@ -232,8 +233,8 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose event:</label>
                                             <div class="col-xs-8">
-                                                <select id="select-event" name="select-event" class="form-control">
-                                                    <option value="-1">All</option>
+                                                <select id="select-event" name="selectEvent" class="form-control">
+                                                    <option value="-1">-All-</option>
                                                     <?php
                                                     $query  = "SELECT EventID, Name FROM Events";
                                                     $result = $conn->query($query);
@@ -253,12 +254,13 @@
                                                 </select>
                                             </div>
                                             <script>
-                                                $('#select-event').selectize({
+                                                var $selectizeEvent = $('#select-event').selectize({
                                                     sortField: {
                                                         field: 'text',
                                                         direction: 'asc'
                                                     }
                                                 });
+                                                var controlSelectEv = $selectizeEvent[0].selectize;
                                             </script>
                                         </div>
 
@@ -266,8 +268,8 @@
                                         <div class="form-group">
                                             <label class="col-xs-4 control-label">Choose host:</label>
                                             <div class="col-xs-8">
-                                                <select id="select-host" name="select-host" class="form-control">
-                                                    <option value="-1">All</option>
+                                                <select id="select-host" name="selectHost" class="form-control">
+                                                    <option value="-1">-All-</option>
                                                     <?php
                                                     $query  = "SELECT ins.InstitutionID, ins.Institution FROM Institutions ins LEFT JOIN Events ev ON ev.HostID = ins.InstitutionID WHERE ev.HostID IS NOT NULL";
                                                     $result = $conn->query($query);
@@ -287,12 +289,13 @@
                                                 </select>
                                             </div>
                                             <script>
-                                                $('#select-host').selectize({
+                                                var $selectizeHost = $('#select-host').selectize({
                                                     sortField: {
                                                         field: 'text',
                                                         direction: 'asc'
                                                     }
                                                 });
+                                                var controlSelectHost = $selectizeHost[0].selectize;
                                             </script>
                                         </div>
                                     </div>
@@ -325,15 +328,15 @@
                                     <th>Title</th>
                                     <th>Email</th>
                                     <th>Event</th>
-                                    <th>Description</th>
                                     <th>Academic Year</th>
+                                    <th>Description</th>
                                     <th>Host</th>
                                 </tr>
                             </thead>
                             <tbody>
                             <?php
                             $query = "SELECT * FROM Participations";
-                            if (isset($_POST['select-institution']) || isset($_POST['select-event']) || isset($_POST['select-year']) || isset($_POST['select-host'])) {
+                            if (isset($_POST['selectInstitution']) || isset($_POST['selectEvent']) || isset($_POST['selectYear']) || isset($_POST['selectHost'])) {
                                 $query = updateReport();
                             }
                             $result = $conn->query($query);
@@ -356,8 +359,8 @@
                                     <td><? echo $paInfo['Title'] ?></td>
                                     <td><? echo $paInfo['Email'] ?></td>
                                     <td><? echo $evInfo['Name']; ?></td>
-                                    <td><? echo $evInfo['Description']; ?></td>
                                     <td><? echo $evInfo['AcademicYear']; ?></td>
+                                    <td><? echo $evInfo['Description']; ?></td>
                                     <td><? echo $evInfo['Host']; ?></td>
                                 </tr>
                                 <?php
@@ -383,23 +386,15 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <!-- Page-Level Scripts -->
     <script>
         $(document).ready(function() {            
             loadReportFilters();
             $('#form-reset').click(function() {
-                $('select[name=select-institution] option').filter(function() {
-                    return $(this).text() == "All"; 
-                }).prop('selected', true);
-                $('select[name=select-event] option').filter(function() {
-                    return $(this).text() == "All"; 
-                }).prop('selected', true);
-                $('select[name=select-year] option').filter(function() {
-                    return $(this).text() == "All"; 
-                }).prop('selected', true);
-                $('select[name=select-host] option').filter(function() {
-                    return $(this).text() == "All"; 
-                }).prop('selected', true);
+                controlSelectIns.setValue(-1);
+                controlSelectEv.setValue(-1);
+                controlSelectYear.setValue(-1);
+                controlSelectHost.setValue(-1);
             });
             var table = $('#reportTable').DataTable( {
                 "lengthChange": false,
@@ -412,14 +407,17 @@
                     { "width": "5%" },
                     { "width": "5%" },
                     { "width": "5%" },
-                    { "width": "15%" },
                     { "width": "10%" },
                     { "width": "10%" },
-                    { "width": "25%" },
+                    { "width": "10%" },
                     { "width": "5%" },
+                    { "width": "25%" },
                     { "width": "10%" }
                 ],
-                order: [[ 1, 'asc' ]],
+                order: [
+                    [ 7, 'asc' ],
+                    [ 1, 'asc' ]
+                ],
                 responsive: true,
                 initComplete: function(){
                     var api = this.api();
@@ -435,6 +433,42 @@
                     api.buttons().container().appendTo( '#' + api.table().container().id + ' .col-sm-6:eq(0)' );  
                 }
             } );
+
+            /** 
+            * Form validation code
+            */
+            var validatorReport = $('#reportForm').validate({
+                ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+                rules: {
+                    selectInstitution: {
+                        required: true
+                    },
+                    selectEvent: {
+                        required: true
+                    },
+                    selectYear: {
+                        required: true
+                    },
+                    selectHost: {
+                        required: true
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
         });
     </script>
 

@@ -4,6 +4,8 @@ require_once 'helper.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
 
+$conn->set_charset('utf8mb4');
+
 if (isset($_POST['table'])) {
 	$table = sanitizeMySQL($conn, $_POST['table']);
 	$query = "";
@@ -68,6 +70,9 @@ if (isset($_POST['table'])) {
 		echo "$conn->error";
 	else
 		echo "success";
+
+
+	$result->close();
+	$conn->close();
 }
-$conn->close();
 ?>

@@ -130,13 +130,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -177,7 +174,9 @@
                             <?php
                             require_once '../server_side/login.php';
                             $conn = new mysqli($hn, $un, $pw, $db);
-                            if ($conn->connect_error) die($conn->connect_error);
+                            if ($conn->connect_error) die($conn->connect_error);\
+
+                            $conn->set_charset('utf8mb4');
 
                             $query  = "SELECT * FROM Institutions";
                             $result = $conn->query($query);
@@ -212,7 +211,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution Name:</label>
                             <div class="col-xs-8">
-                                <input id="institution-name" name="institutionName" type="text" class="form-control" placeholder="Input can only contain characters and space">
+                                <input id="institution-name" name="institutionName" type="text" class="form-control" placeholder="Enter institution name">
                             </div>
                         </div>
                         <div class="form-group">
@@ -245,7 +244,7 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <!-- Page-Level Scripts -->
     <script>
         var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
@@ -253,7 +252,11 @@
             var table = $('#institutionsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
-                    "emptyTable": "There is no institution at this point"
+                    "emptyTable": "There is no institution at this point",
+                    buttons: {
+                        selectAll: "Select all items",
+                        selectNone: "Select none"
+                    }
                 },
                 "autoWidth": false,
                 "columns": [ 
@@ -282,6 +285,8 @@
                     var api = this.api();
                     new $.fn.dataTable.Buttons(api, {
                         buttons: [
+                            'selectAll',
+                            'selectNone',
                             {
                                 text: 'New',
                                 action: function ( e, dt, node, config ) {
@@ -408,15 +413,15 @@
             } );
 
             table.on( 'select', function () {
-                table.button( 1 ).enable();
-                table.button( 2 ).enable();
+                table.button( 3 ).enable();
+                table.button( 4 ).enable();
             } );
 
             table.on( 'deselect', function () {
                 var count = table.rows( { selected: true } ).count();
                 if (!count) {
-                    table.button( 1 ).disable();
-                    table.button( 2 ).disable();
+                    table.button( 3 ).disable();
+                    table.button( 4 ).disable();
                 }
             } );
 
@@ -427,8 +432,7 @@
                 rules: {
                     institutionName: {
                         maxlength: 100,
-                        required: true,
-                        regex: /^[A-Za-z0-9\s]{1,}[\.]{0,1}[A-Za-z0-9\s]{0,}$/
+                        required: true
                     },
                     optionsRadiosInline: {
                         required: true

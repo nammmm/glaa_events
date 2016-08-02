@@ -130,13 +130,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -184,6 +181,8 @@
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
+                            $conn->set_charset('utf8mb4');
+                            
                             $query  = "SELECT * FROM Participants";
                             $result = $conn->query($query);
                             if (!$result) 
@@ -233,7 +232,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Institution:</label>
                             <div class="col-xs-8">
-                                <select id="select-institution" class="form-control" placeholder="Select institution" required>
+                                <select id="select-institution" name="selectInstitution" class="form-control" placeholder="Select institution">
                                     <option>Select institution</option>
                                     <?php
                                     $query  = "SELECT InstitutionID, Institution FROM Institutions";
@@ -280,7 +279,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Email:</label>
                             <div class="col-xs-8">
-                                <input id="email" name="email" type="text" class="form-control" placeholder="Optional">
+                                <input id="email" name="email" type="email" class="form-control" placeholder="Optional">
                             </div>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -302,7 +301,7 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <!-- Page-Level Scripts -->
     <script>
         var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
@@ -310,7 +309,11 @@
             var table = $('#participantsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
-                    "emptyTable": "There is no participant at this point"
+                    "emptyTable": "There is no participant at this point",
+                    buttons: {
+                        selectAll: "Select all items",
+                        selectNone: "Select none"
+                    }
                 },
                 "autoWidth": false,
                 "columns": [ 
@@ -344,6 +347,8 @@
                     var api = this.api();
                     new $.fn.dataTable.Buttons(api, {
                         buttons: [
+                            'selectAll',
+                            'selectNone',
                             {
                                 text: 'New',
                                 action: function ( e, dt, node, config ) {
@@ -471,15 +476,15 @@
             } );
 
             table.on( 'select', function () {
-                table.button( 1 ).enable();
-                table.button( 2 ).enable();
+                table.button( 3 ).enable();
+                table.button( 4 ).enable();
             } );
 
             table.on( 'deselect', function () {
                 var count = table.rows( { selected: true } ).count();
                 if (!count) {
-                    table.button( 1 ).disable();
-                    table.button( 2 ).disable();
+                    table.button( 3 ).disable();
+                    table.button( 4 ).disable();
                 }
             } );
 
@@ -498,6 +503,9 @@
                         maxlength: 30,
                         required: true,
                         regex: /^[A-Za-z]{1,}$/
+                    },
+                    selectInstitution: {
+                        required: true
                     },
                     role: {
                         maxlength: 100,

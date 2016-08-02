@@ -130,13 +130,10 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="#">Import CSV</a>
+                                    <a href="importCSV.php">Import File</a>
                                 </li>
                                 <li>
-                                    <a href="#">Export CSV</a>
-                                </li>
-                                <li>
-                                    <a href="#">Back Up</a>
+                                    <a href="backup.php">Back Up</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -183,6 +180,8 @@
                             $conn = new mysqli($hn, $un, $pw, $db);
                             if ($conn->connect_error) die($conn->connect_error);
 
+                            $conn->set_charset('utf8mb4');
+
                             $query  = "SELECT * FROM Participations";
                             $result = $conn->query($query);
                             if (!$result) 
@@ -221,7 +220,7 @@
                         <!-- Select participant -->
                         <div class="form-group">
                             <label class="control-label" style="padding-bottom: 6px;">Select Participant</label>
-                            <select id="select-participant" name="select-participant" class="form-control" placeholder="Select participant" required>
+                            <select id="select-participant" name="selectParticipant" class="form-control" placeholder="Select participant" required>
                                 <option>Select participant</option>
                                 <?php
                                 $query  = "SELECT ParticipantID, FirstName, LastName FROM Participants";
@@ -257,7 +256,7 @@
                         <!-- Select event -->
                         <div id="div-select-events" class="form-group">
                             <label class="control-label" style="padding-bottom: 6px;">Select Events</label>
-                            <select id="select-events" name="select-events" multiple class="form-control" placeholder="Select events" required>
+                            <select id="select-events" name="selectEvents" multiple class="form-control" placeholder="Select events" required>
                                 <option>Select events</option>
                             </select>
                         </div>
@@ -275,7 +274,7 @@
                         <!-- Edit Mode: Select event -->
                         <div id="div-select-events-edit" class="form-group" style="display: none;">
                             <label class="control-label" style="padding-bottom: 6px;">Select Event</label>
-                            <select id="select-events-edit" class="form-control" required>
+                            <select id="select-events-edit" name="selectEventsEdit" class="form-control" required>
                             </select>
                         </div>
                         <script>
@@ -327,7 +326,7 @@
                         <!-- Select participant -->
                         <div class="form-group">
                             <label class="control-label" style="padding-bottom: 6px;">Select Event</label>
-                            <select id="select-event" name="select-event" class="form-control" placeholder="Select event" required>
+                            <select id="select-event" name="selectEvent" class="form-control" placeholder="Select event">
                                 <option>Select event</option>
                                 <?php
                                 $query  = "SELECT EventID, Name FROM Events";
@@ -361,7 +360,7 @@
                         <!-- Select event -->
                         <div class="form-group">
                             <label class="control-label" style="padding-bottom: 6px;">Select Events</label>
-                            <select id="select-participants" name="select-participants" multiple class="form-control" placeholder="Select participants" required>
+                            <select id="select-participants" name="selectParticipants" multiple class="form-control" placeholder="Select participants" required>
                                 <option>Select participants</option>
                             </select>
                         </div>
@@ -421,7 +420,7 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <!-- Page-Level Scripts -->
     <script>
         var rowsData;   // global variable to hold multiple rows data
         $(document).ready(function() {
@@ -429,7 +428,11 @@
             var table = $('#participationsTable').DataTable( {
                 "lengthChange": false,
                 "language": {
-                    "emptyTable": "There is no participation at this point"
+                    "emptyTable": "There is no participation at this point",
+                    buttons: {
+                        selectAll: "Select all items",
+                        selectNone: "Select none"
+                    }
                 },
                 "autoWidth": false,
                 "columns": [ 
@@ -462,6 +465,8 @@
                     var api = this.api();
                     new $.fn.dataTable.Buttons(api, {
                         buttons: [
+                            'selectAll',
+                            'selectNone',
                             {
                                 text: 'Add By Participant',
                                 action: function ( e, dt, node, config ) {
@@ -659,26 +664,34 @@
             } );
 
             table.on( 'select', function () {
-                table.button( 2 ).enable();
-                table.button( 3 ).enable();
+                table.button( 4 ).enable();
+                table.button( 5 ).enable();
             } );
 
             table.on( 'deselect', function () {
                 var count = table.rows( { selected: true } ).count();
                 if (!count) {
-                    table.button( 2 ).disable();
-                    table.button( 3 ).disable();
+                    table.button( 4 ).disable();
+                    table.button( 5 ).disable();
                 }
             } );
 
             var count = table.rows( { selected: true } ).count();
-            if (count > 1)  table.button( 2 ).disable();
+            if (count > 1)  table.button( 4 ).disable();
 
             /** 
             * Form validation code
             */
             var validatorParticipationByPa = $('#participationByPaForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+                rules: {
+                    selectParticipant: {
+                        required: true
+                    },
+                    selectEvents: {
+                        required: true
+                    }
+                },
                 highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
                 },
@@ -698,6 +711,17 @@
 
             var validatorParticipationByEv = $('#participationByEvForm').validate({
                 ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+                rules: {
+                    selectEvent: {
+                        required: true
+                    },
+                    selectParticipants: {
+                        required: true
+                    },
+                    selectEventsEdit: {
+                        required: true
+                    }
+                },
                 highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
                 },

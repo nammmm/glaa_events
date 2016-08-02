@@ -4,6 +4,8 @@ require_once 'helper.php';
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
 
+$conn->set_charset('utf8mb4');
+
 // if (true) {
 if (isset($_POST['table'])) {
 	$table = sanitizeMySQL($conn, $_POST['table']);
@@ -54,7 +56,6 @@ if (isset($_POST['table'])) {
 			foreach ($participantIDs as $participantID)
 				$query .= "(" . $participantID . ", " . $eventID . "), "; 
 			$query = rtrim($query, ", ");
-			// print_r($query);
 			break;
 		default:
 			break;
@@ -65,6 +66,9 @@ if (isset($_POST['table'])) {
 		echo "$conn->error";
 	else
 		echo "success";
+
+
+	$result->close();
+	$conn->close();
 }
-$conn->close();
 ?>
