@@ -175,9 +175,14 @@
                     </p>
 
                     <h3>3. Import SQL File</h3>
+                    <p>If there isn't a database named <strong>glaa_events</strong> on your localhost, you need to create it in phpMyAdmin by clicking the <strong>new</strong> button on the left hand side. Type the name and then hit <strong>create</strong>.
+                        <br> 
+                        <img src="../dist/img/backUp3_1.png" alt="Create Database" align="middle">
+                    </p>
+                    <br>
                     <p>Select <strong>Import</strong> tab on the main panel and choose the SQL file to import. After that, click <strong>Go</strong> at the bottom.
                         <br> 
-                        <img src="../dist/img/backUp3_1.png" alt="Import SQL File" align="middle">
+                        <img src="../dist/img/backUp3_2.png" alt="Import SQL File" align="middle">
                     </p>
                 </div>
             </div>
