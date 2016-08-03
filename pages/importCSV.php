@@ -194,7 +194,6 @@
             $("#uploadFileForm").submit(function(e) {
                 // cancels the form submission
                 e.preventDefault();
-                // importCSV();
                 $.ajax( {
                     type: "POST",
                     url: "../server_side/file_upload.php",
@@ -222,8 +221,6 @@
             if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
                 filename = filename.substring(1);
             }
-            // alert(filename);
-            // var filename = "Gray 2016 Spring Event Reporting.csv";
             var formData = { file:filename };
             $.ajax( {
                 type: "POST",

@@ -180,7 +180,7 @@
                             if ($conn->connect_error) die($conn->connect_error);
 
                             $conn->set_charset('utf8mb4');
-                            
+
                             $query  = "SELECT * FROM Events";
                             $result = $conn->query($query);
                             if (!$result) 
@@ -478,7 +478,6 @@
 
             table.on( 'deselect', function () {
                 var count = table.rows( { selected: true } ).count();
-                console.log(count);
                 if (!count) {
                     table.button( 3 ).disable();
                     table.button( 4 ).disable();
