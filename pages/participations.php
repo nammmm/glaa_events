@@ -130,7 +130,7 @@
                             <a href="#"><i class="fa fa-cog fa-fw"></i> Settings<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="importCSV.php">Import File</a>
+                                    <a href="importCSV.php">Import CSV</a>
                                 </li>
                                 <li>
                                     <a href="backup.php">Back Up</a>
