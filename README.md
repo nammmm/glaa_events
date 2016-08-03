@@ -26,12 +26,15 @@ There are four categories of data: *Institutions*, *Participants*, *Events*, and
 - **Import CSV**: Imports data from a CSV file into the database.
 - **Back Up**: Provides instruction on how to back up database using phpMyAdmin.
 
+The use of Google Chrome is recommended.
+
 ## Libraries Used
 
 - [BootStrap](http://getbootstrap.com)
 - [jQuery](https://jquery.com)
 - [DataTables](https://datatables.net)
 - [Font Awesome](http://fontawesome.io)
+- [jQuery Validation](https://jqueryvalidation.org)
 - [Bootbox.js](http://bootboxjs.com)
 - [Selectize.js](http://selectize.github.io/selectize.js/)
 
