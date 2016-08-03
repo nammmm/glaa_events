@@ -182,7 +182,7 @@
                             if ($conn->connect_error) die($conn->connect_error);
 
                             $conn->set_charset('utf8mb4');
-                            
+
                             $query  = "SELECT * FROM Participants";
                             $result = $conn->query($query);
                             if (!$result) 
@@ -279,7 +279,7 @@
                         <div class="form-group">
                             <label class="col-xs-4 control-label">Email:</label>
                             <div class="col-xs-8">
-                                <input id="email" name="email" type="email" class="form-control" placeholder="Optional">
+                                <input id="email" name="email" type="email" class="form-control" placeholder="example@institution.edu">
                             </div>
                         </div>
                         <button type="submit" id="form-update" class="hidden"></button>
@@ -517,6 +517,7 @@
                     },
                     email: {
                         maxlength: 120,
+                        required: true,
                         regex: /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/
                     }
                 },
